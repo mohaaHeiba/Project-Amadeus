@@ -1,0 +1,9 @@
+# dart run flutter_launcher_icons -f flutter_launcher_icons.yaml
+flutter_launcher_icons:
+  android: "ic_launcher"
+  ios: true
+  image_path: "assets/icons/app_icon.png"
+  remove_alpha_ios: true
+  background_color_ios: "#E9E8E6"
+  adaptive_icon_background: "#E9E8E6"
+  adaptive_icon_foreground: "assets/icons/app_icon.png"
