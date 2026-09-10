@@ -6,8 +6,8 @@ class Assets {
   /// assets/icons/logo.png
   static const String iconsLogo = "assets/icons/logo.png";
 
-  /// Assets for imagesLogo
-  /// assets/images/logo.png
-  static const String imagesLogo = "assets/images/logo.png";
+  /// Assets for imagesLogo1
+  /// assets/images/logo1.png
+  static const String imagesLogo1 = "assets/images/logo1.png";
 }
 
