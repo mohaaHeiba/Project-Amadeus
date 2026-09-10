@@ -6,7 +6,7 @@ class AppColors {
   // ==========================================
   // 1. Material 3 Color Scheme (من قسم YAML)
   // ==========================================
-  static const Color background = Color(0xFF16130C);
+  static const Color background = Color(0xFF121212);
   static const Color onBackground = Color(0xFFE9E2D4);
 
   static const Color surface = Color(0xFF16130C);
