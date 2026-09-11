@@ -1,6 +1,5 @@
-import 'package:amadeus_app/constants/assets.dart';
-import 'package:amadeus_app/core/routes/app_router.dart';
-import 'package:amadeus_app/core/theme/app_colors.dart';
+import 'package:amadeus_app/core/constants/assets.dart';
+import 'package:amadeus_app/core/routes/app_routes.dart';
 import 'package:amadeus_app/features/splash/presentation/widgets/glitch_painter.dart';
 import 'package:amadeus_app/features/splash/presentation/widgets/grid_painter.dart';
 import 'package:flutter/material.dart';
@@ -45,7 +44,6 @@ class _SplashScreenState extends State<SplashScreen>
     final size = MediaQuery.sizeOf(context);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       body: Stack(
         alignment: Alignment.center,
         children: [

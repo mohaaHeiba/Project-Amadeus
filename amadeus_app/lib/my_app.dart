@@ -1,4 +1,4 @@
-import 'package:amadeus_app/core/routes/app_router.dart';
+import 'package:amadeus_app/core/routes/app_routes.dart';
 import 'package:amadeus_app/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 

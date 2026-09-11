@@ -46,6 +46,7 @@ class AppColors {
   static const Color onError = Color(0xFF690005);
   static const Color errorContainer = Color(0xFF93000A);
   static const Color onErrorContainer = Color(0xFFFFDAD6);
+  static const Color success = Color.fromARGB(255, 105, 240, 174);
 
   // ==========================================
   // 2. Narrative UI Specifics (من قسم الشرح)

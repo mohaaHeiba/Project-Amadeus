@@ -1,5 +1,7 @@
+import 'package:amadeus_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:amadeus_app/features/auth/presentation/screens/auth_screen.dart';
 import 'package:amadeus_app/features/splash/presentation/screens/splash_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 class AppRouter {
@@ -15,7 +17,13 @@ class AppRouter {
     // const Scaffold(body: Center(child: Text('Page not found!'))),
     routes: [
       GoRoute(path: splash, builder: (context, state) => const SplashScreen()),
-      GoRoute(path: auth, builder: (context, state) => const AuthScreen()),
+      GoRoute(
+        path: auth,
+        builder: (context, state) => BlocProvider(
+          create: (context) => AuthBloc(),
+          child: const AuthScreen(),
+        ),
+      ),
       // GoRoute(
       //   path: details,
       //   // builder: (context, state) => const DetailsPage(),
