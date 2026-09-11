@@ -1,12 +1,14 @@
 import 'package:amadeus_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:amadeus_app/features/auth/presentation/screens/auth_screen.dart';
+import 'package:amadeus_app/features/home/presentation/screens/home_screen.dart';
 import 'package:amadeus_app/features/splash/presentation/screens/splash_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-class AppRouter {
+class AppRoutes {
   static const String splash = '/';
   static const String auth = '/auth';
+  static const String home = '/home';
 
   // static const String details = '/onbording';
 
@@ -24,6 +26,9 @@ class AppRouter {
           child: const AuthScreen(),
         ),
       ),
+
+      GoRoute(path: home, builder: (context, state) => const HomeScreen()),
+
       // GoRoute(
       //   path: details,
       //   // builder: (context, state) => const DetailsPage(),

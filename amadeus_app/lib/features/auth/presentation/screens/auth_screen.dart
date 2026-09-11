@@ -44,7 +44,7 @@ class _AuthScreenState extends State<AuthScreen> {
           } else if (state is AuthSuccess) {
             Future.delayed(const Duration(milliseconds: 1500), () {
               if (context.mounted) {
-                context.go(AppRouter.splash);
+                context.go(AppRoutes.home);
               }
             });
           }

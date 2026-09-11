@@ -1,5 +1,6 @@
 import 'package:amadeus_app/core/constants/assets.dart';
 import 'package:amadeus_app/core/routes/app_routes.dart';
+import 'package:amadeus_app/core/theme/app_colors.dart';
 import 'package:amadeus_app/features/splash/presentation/widgets/glitch_painter.dart';
 import 'package:amadeus_app/features/splash/presentation/widgets/grid_painter.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +28,7 @@ class _SplashScreenState extends State<SplashScreen>
     if (mounted) {
       controller.addStatusListener((status) {
         if (status == AnimationStatus.completed) {
-          context.go(AppRouter.auth);
+          context.go(AppRoutes.auth);
         }
       });
     }
@@ -49,26 +50,39 @@ class _SplashScreenState extends State<SplashScreen>
         children: [
           CustomPaint(size: size, painter: GridPainter()),
 
-          // Gradient Fade
+          // Ambient Warm Amber Glow at Top
+          Positioned(
+            top: -120,
+            left: 0,
+            right: 0,
+            height: 380,
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: RadialGradient(
+                  center: Alignment.topCenter,
+                  radius: 0.9,
+                  colors: [
+                    AppColors.primaryContainer.withValues(alpha: 0.14),
+                    AppColors.secondaryContainer.withValues(alpha: 0.04),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // Subtle Bottom Dark Fade
           Positioned(
             bottom: 0,
             left: 0,
             right: 0,
-            height: size.height * 0.4,
+            height: 160,
             child: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.bottomCenter,
                   end: Alignment.topCenter,
-                  colors: [
-                    const Color.fromARGB(
-                      255,
-                      85,
-                      73,
-                      58,
-                    ).withValues(alpha: 0.3),
-                    Colors.transparent,
-                  ],
+                  colors: [AppColors.scaffoldBackground, Colors.transparent],
                 ),
               ),
             ),
