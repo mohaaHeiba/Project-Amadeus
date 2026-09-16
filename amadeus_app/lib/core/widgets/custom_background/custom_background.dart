@@ -1,5 +1,5 @@
 import 'package:amadeus_app/core/theme/app_colors.dart';
-import 'package:amadeus_app/features/splash/presentation/widgets/grid_painter.dart';
+import 'package:amadeus_app/core/widgets/custom_background/widgets/grid_painter.dart';
 import 'package:flutter/material.dart';
 
 Widget customBackground(BuildContext context) {

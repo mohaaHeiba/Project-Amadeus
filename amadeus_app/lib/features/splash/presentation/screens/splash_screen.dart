@@ -1,7 +1,7 @@
 import 'package:amadeus_app/core/constants/assets.dart';
 import 'package:amadeus_app/core/routes/app_routes.dart';
-import 'package:amadeus_app/core/widgets/custom_background.dart';
-import 'package:amadeus_app/features/splash/presentation/widgets/glitch_painter.dart';
+import 'package:amadeus_app/core/widgets/custom_background/custom_background.dart';
+import 'package:amadeus_app/core/widgets/custom_background/widgets/glitch_painter.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 

@@ -2,7 +2,7 @@ import 'package:amadeus_app/core/Extensions/spacing.dart';
 import 'package:amadeus_app/core/routes/app_routes.dart';
 import 'package:amadeus_app/core/theme/app_colors.dart';
 import 'package:amadeus_app/core/utils/custom_snackbar.dart';
-import 'package:amadeus_app/core/widgets/custom_background.dart';
+import 'package:amadeus_app/core/widgets/custom_background/custom_background.dart';
 import 'package:amadeus_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:amadeus_app/features/auth/presentation/widgets/amadeus_text_field.dart';
 import 'package:amadeus_app/features/auth/presentation/widgets/build_telemetry_header.dart';
