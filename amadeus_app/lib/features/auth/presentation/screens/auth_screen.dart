@@ -2,13 +2,13 @@ import 'package:amadeus_app/core/Extensions/spacing.dart';
 import 'package:amadeus_app/core/routes/app_routes.dart';
 import 'package:amadeus_app/core/theme/app_colors.dart';
 import 'package:amadeus_app/core/utils/custom_snackbar.dart';
+import 'package:amadeus_app/core/widgets/custom_background.dart';
 import 'package:amadeus_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:amadeus_app/features/auth/presentation/widgets/amadeus_text_field.dart';
+import 'package:amadeus_app/features/auth/presentation/widgets/build_telemetry_header.dart';
 import 'package:amadeus_app/features/auth/presentation/widgets/cyber_button.dart';
 import 'package:amadeus_app/features/auth/presentation/widgets/cyber_panel.dart';
-import 'package:amadeus_app/features/auth/presentation/widgets/telemetry_header.dart';
 import 'package:amadeus_app/features/auth/presentation/widgets/terminal_footer.dart';
-import 'package:amadeus_app/features/splash/presentation/widgets/grid_painter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -27,93 +27,32 @@ class _AuthScreenState extends State<AuthScreen> {
     context.read<AuthBloc>().add(SaveOperatorNameEvent(nameController.text));
   }
 
+  void _handleAuthListener(BuildContext context, AuthState state) {
+    if (state is AuthError) {
+      CustomSnackbar.show(
+        isError: true,
+        context: context,
+        message: state.message,
+      );
+    } else if (state is AuthSuccess) {
+      Future.delayed(const Duration(milliseconds: 1500), () {
+        if (context.mounted) {
+          context.go(AppRoutes.home);
+        }
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.sizeOf(context);
-    print("asdas");
-
     return Scaffold(
       body: BlocConsumer<AuthBloc, AuthState>(
-        listener: (context, state) {
-          if (state is AuthError) {
-            CustomSnackbar.show(
-              isError: true,
-              context: context,
-              message: state.message,
-            );
-          } else if (state is AuthSuccess) {
-            Future.delayed(const Duration(milliseconds: 1500), () {
-              if (context.mounted) {
-                context.go(AppRoutes.home);
-              }
-            });
-          }
-        },
+        listener: _handleAuthListener,
         builder: (context, state) {
-          String headerStatus = 'SYSTEM READY - WAITING FOR INPUT';
-          Color headerColor = AppColors.primaryContainer;
-          bool isPulsing = false;
-
-          if (state is AuthLoading) {
-            headerStatus = ' CONNECTING // ESTABLISHING LINK';
-            headerColor = AppColors.primaryContainer;
-          } else if (state is AuthError) {
-            headerStatus = 'STATUS: LINK FAILED // ACCESS DENIED';
-            headerColor = AppColors.error;
-            isPulsing = true;
-          } else if (state is AuthSuccess) {
-            headerStatus = ' STATUS: UPLINK ESTABLISHED';
-            headerColor = AppColors.success;
-            isPulsing = false;
-          }
           return Stack(
             children: [
               // Background Cyber Grid (Continuous with Splash)
-              Positioned.fill(
-                child: CustomPaint(size: size, painter: GridPainter()),
-              ),
-
-              // Ambient Warm Amber Glow at Top
-              Positioned(
-                top: -120,
-                left: 0,
-                right: 0,
-                height: 380,
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: RadialGradient(
-                      center: Alignment.topCenter,
-                      radius: 0.9,
-                      colors: [
-                        AppColors.primaryContainer.withValues(alpha: 0.14),
-                        AppColors.secondaryContainer.withValues(alpha: 0.04),
-                        Colors.transparent,
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-
-              // Subtle Bottom Dark Fade
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                height: 160,
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.topCenter,
-                      colors: [
-                        AppColors.scaffoldBackground,
-                        Colors.transparent,
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-
+              customBackground(context),
               // Main Interactive Area
               Center(
                 child: SingleChildScrollView(
@@ -126,11 +65,8 @@ class _AuthScreenState extends State<AuthScreen> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         // Header with telemetry & branding
-                        TelemetryHeader(
-                          statusText: headerStatus,
-                          statusColor: headerColor,
-                          isPulsing: isPulsing,
-                        ),
+                        buildTelemetryHeader(state),
+
                         32.verticalSpace,
 
                         // Futuristic Auth Panel
