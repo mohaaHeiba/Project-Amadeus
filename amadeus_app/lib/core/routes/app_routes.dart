@@ -1,3 +1,4 @@
+import 'package:amadeus_app/core/services/service_locator.dart';
 import 'package:amadeus_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:amadeus_app/features/auth/presentation/screens/auth_screen.dart';
 import 'package:amadeus_app/features/home/presentation/screens/home_screen.dart';
@@ -22,7 +23,7 @@ class AppRoutes {
       GoRoute(
         path: auth,
         builder: (context, state) => BlocProvider(
-          create: (context) => AuthBloc(),
+          create: (context) => sl<AuthBloc>(),
           child: const AuthScreen(),
         ),
       ),
