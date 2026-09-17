@@ -1,3 +1,4 @@
+import 'package:amadeus_app/core/services/cache_helper.dart';
 import 'package:amadeus_app/core/services/service_locator.dart';
 import 'package:amadeus_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:amadeus_app/features/auth/presentation/screens/auth_screen.dart';
@@ -14,7 +15,7 @@ class AppRoutes {
   // static const String details = '/onbording';
 
   static final GoRouter router = GoRouter(
-    initialLocation: splash,
+    initialLocation: sl<CacheHelper>().isLoggedIn ? home : splash,
 
     // errorBuilder: (context, state) =>
     // const Scaffold(body: Center(child: Text('Page not found!'))),

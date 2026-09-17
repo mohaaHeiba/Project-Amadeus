@@ -12,4 +12,12 @@ class CacheHelper {
   Future<bool> setLoggedIn() async {
     return await sharedPreferences.setBool(AppKeys.isLoggedIn, true);
   }
+
+  bool get isLoggedIn {
+    return sharedPreferences.getBool(AppKeys.isLoggedIn) ?? false;
+  }
+
+  String get getOperatorName {
+    return sharedPreferences.getString(AppKeys.operatorName) ?? 'Geust';
+  }
 }
