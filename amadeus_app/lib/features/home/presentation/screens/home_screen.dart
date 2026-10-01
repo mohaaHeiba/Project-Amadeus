@@ -1,34 +1,33 @@
-import 'package:amadeus_app/core/constants/app_keys.dart';
+import 'package:amadeus_app/core/Extensions/spacing.dart';
+import 'package:amadeus_app/core/widgets/custom_background/custom_background.dart';
+import 'package:amadeus_app/features/avatar/presentation/screens/avatar_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
-  Future<String?> getName() async {
-    final sharedPreferences = await SharedPreferences.getInstance();
-    return sharedPreferences.getString(AppKeys.operatorName);
-  }
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
 
+class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: FutureBuilder<String?>(
-          future: getName(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const CircularProgressIndicator();
-            }
+      body: Column(
+        children: [
+          32.verticalSpace,
+          Expanded(
+            child: Stack(
+              children: [
+                customBackground(context),
 
-            if (snapshot.hasError) {
-              return Text('sadasdasdas ${snapshot.error}');
-            }
-
-            final name = snapshot.data;
-            return Text(name ?? 'sada');
-          },
-        ),
+                // 2. Character
+                const AvatarScreen(),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

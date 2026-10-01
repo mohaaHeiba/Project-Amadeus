@@ -2,6 +2,7 @@ import 'package:amadeus_app/core/services/cache_helper.dart';
 import 'package:amadeus_app/core/services/service_locator.dart';
 import 'package:amadeus_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:amadeus_app/features/auth/presentation/screens/auth_screen.dart';
+import 'package:amadeus_app/features/avatar/presentation/bloc/avatar_bloc.dart';
 import 'package:amadeus_app/features/home/presentation/screens/home_screen.dart';
 import 'package:amadeus_app/features/splash/presentation/screens/splash_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -29,7 +30,13 @@ class AppRoutes {
         ),
       ),
 
-      GoRoute(path: home, builder: (context, state) => const HomeScreen()),
+      GoRoute(
+        path: home,
+        builder: (context, state) => BlocProvider(
+          create: (context) => AvatarBloc(),
+          child: const HomeScreen(),
+        ),
+      ),
 
       // GoRoute(
       //   path: details,
