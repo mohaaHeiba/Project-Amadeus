@@ -239,9 +239,7 @@ class AppTheme {
           foregroundColor: AppColors.onPrimaryContainer,
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(4),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
           textStyle: const TextStyle(
             fontFamily: 'Space Grotesk',
             fontFamilyFallback: ['sans-serif'],
@@ -253,31 +251,32 @@ class AppTheme {
       ),
 
       outlinedButtonTheme: OutlinedButtonThemeData(
-        style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.primaryContainer,
-          side: const BorderSide(
-            color: AppColors.primaryContainer,
-            width: 1.2,
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(4),
-          ),
-          textStyle: const TextStyle(
-            fontFamily: 'Space Grotesk',
-            fontFamilyFallback: ['sans-serif'],
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 2.0,
-          ),
-        ).copyWith(
-          overlayColor: WidgetStateProperty.resolveWith<Color?>((states) {
-            if (states.contains(WidgetState.pressed)) {
-              return AppColors.primaryActionTap;
-            }
-            return null;
-          }),
-        ),
+        style:
+            OutlinedButton.styleFrom(
+              foregroundColor: AppColors.primaryContainer,
+              side: const BorderSide(
+                color: AppColors.primaryContainer,
+                width: 1.2,
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4),
+              ),
+              textStyle: const TextStyle(
+                fontFamily: 'Space Grotesk',
+                fontFamilyFallback: ['sans-serif'],
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 2.0,
+              ),
+            ).copyWith(
+              overlayColor: WidgetStateProperty.resolveWith<Color?>((states) {
+                if (states.contains(WidgetState.pressed)) {
+                  return AppColors.primaryActionTap;
+                }
+                return null;
+              }),
+            ),
       ),
 
       textButtonTheme: TextButtonThemeData(
@@ -301,10 +300,7 @@ class AppTheme {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(4),
-          side: const BorderSide(
-            color: AppColors.dividerStrong,
-            width: 1.0,
-          ),
+          side: const BorderSide(color: AppColors.dividerStrong, width: 1.0),
         ),
       ),
 
@@ -313,10 +309,7 @@ class AppTheme {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(4),
-          side: const BorderSide(
-            color: AppColors.dividerStrong,
-            width: 1.0,
-          ),
+          side: const BorderSide(color: AppColors.dividerStrong, width: 1.0),
         ),
         titleTextStyle: const TextStyle(
           fontFamily: 'Space Grotesk',
@@ -339,10 +332,7 @@ class AppTheme {
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(4),
-          side: const BorderSide(
-            color: AppColors.primaryContainer,
-            width: 1.0,
-          ),
+          side: const BorderSide(color: AppColors.primaryContainer, width: 1.0),
         ),
         contentTextStyle: const TextStyle(
           fontFamily: 'JetBrains Mono',
@@ -361,13 +351,8 @@ class AppTheme {
           return Colors.transparent;
         }),
         checkColor: const WidgetStatePropertyAll(AppColors.onPrimaryContainer),
-        side: const BorderSide(
-          color: AppColors.checkboxBorder,
-          width: 1.0,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(2),
-        ),
+        side: const BorderSide(color: AppColors.checkboxBorder, width: 1.0),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
       ),
 
       dividerTheme: const DividerThemeData(

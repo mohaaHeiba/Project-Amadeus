@@ -1,6 +1,6 @@
 import 'package:amadeus_app/core/constants/assets.dart';
 import 'package:amadeus_app/core/widgets/custom_background/custom_background.dart';
-import 'package:amadeus_app/features/avatar/presentation/bloc/avatar_bloc.dart';
+import 'package:amadeus_app/features/avatar/presentation/avatar_bloc/avatar_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rive/rive.dart';
@@ -83,7 +83,7 @@ class _AvatarScreenState extends State<AvatarScreen> {
                           });
                           return RiveWidget(
                             controller: riveState.controller,
-                            fit: Fit.cover,
+                            fit: Fit.contain,
                           );
                       }
                     },
