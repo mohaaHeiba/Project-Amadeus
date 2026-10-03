@@ -3,6 +3,7 @@ import 'package:amadeus_app/core/services/service_locator.dart';
 import 'package:amadeus_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:amadeus_app/features/auth/presentation/screens/auth_screen.dart';
 import 'package:amadeus_app/features/avatar/presentation/avatar_bloc/avatar_bloc.dart';
+import 'package:amadeus_app/features/avatar/presentation/conversation_bloc/conversation_bloc.dart';
 import 'package:amadeus_app/features/home/presentation/screens/home_screen.dart';
 import 'package:amadeus_app/features/splash/presentation/screens/splash_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -32,8 +33,11 @@ class AppRoutes {
 
       GoRoute(
         path: home,
-        builder: (context, state) => BlocProvider(
-          create: (context) => AvatarBloc(),
+        builder: (context, state) => MultiBlocProvider(
+          providers: [
+            BlocProvider(create: (context) => AvatarBloc()),
+            BlocProvider(create: (context) => ConversationBloc()),
+          ],
           child: const HomeScreen(),
         ),
       ),
