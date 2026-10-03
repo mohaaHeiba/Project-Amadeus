@@ -38,7 +38,7 @@ class AppRoutes {
             BlocProvider(create: (context) => AvatarBloc()),
             BlocProvider(create: (context) => ConversationBloc()),
           ],
-          child: const HomeScreen(),
+          child: HomeScreen(sendMessageUsecase: sl()),
         ),
       ),
 
