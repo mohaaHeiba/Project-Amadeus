@@ -32,6 +32,7 @@ class GroqDatasourceImpl extends GroqDatasource {
       },
     );
     final responseModel = GroqResponseModel.fromJson(res.data);
+    print(responseModel.replyText);
     return responseModel;
   }
 }

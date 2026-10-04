@@ -1,3 +1,6 @@
+import 'package:amadeus_app/core/constants/interaction_mode.dart';
+import 'package:amadeus_app/core/services/cache_helper.dart';
+import 'package:amadeus_app/features/ai/domain/usecases/send_message_usecase.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -5,17 +8,23 @@ part 'conversation_event.dart';
 part 'conversation_state.dart';
 
 class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
-  ConversationBloc() : super(ConversationInitial()) {
+  final SendMessageUsecase sendMessageUsecase;
+  final CacheHelper cacheHelper;
+
+  ConversationBloc({
+    required this.sendMessageUsecase,
+    required this.cacheHelper,
+  }) : super(ConversationInitial(mode: cacheHelper.getInteractionMode)) {
     on<AppReadyEvent>(_onAppReady);
     on<ToggleListeningEvent>(_onToggleListening);
-    on<StartThinkingEvent>(_onStartThinking);
-    on<ResponseReceivedEvent>(_onResponseReceived);
+    on<SendUserMessageEvent>(_onSendUserMessage);
     on<SpeakingFinishedEvent>(_onSpeakingFinished);
     on<ConversationFailedEvent>(_onConversationFailed);
+    on<ChangeInteractionModeEvent>(_onChangeMode);
   }
 
   void _onAppReady(AppReadyEvent event, Emitter<ConversationState> emit) {
-    emit(ConversationIdle());
+    emit(ConversationIdle(mode: state.mode));
   }
 
   void _onToggleListening(
@@ -23,37 +32,53 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
     Emitter<ConversationState> emit,
   ) {
     if (event.isListening) {
-      emit(ConversationListening());
+      emit(ConversationListening(mode: state.mode));
     } else {
-      emit(ConversationIdle());
+      emit(ConversationIdle(mode: state.mode));
     }
   }
 
-  void _onStartThinking(
-    StartThinkingEvent event,
+  Future<void> _onSendUserMessage(
+    SendUserMessageEvent event,
     Emitter<ConversationState> emit,
-  ) {
-    emit(ConversationThinking());
-  }
+  ) async {
+    emit(ConversationThinking(mode: state.mode));
 
-  void _onResponseReceived(
-    ResponseReceivedEvent event,
-    Emitter<ConversationState> emit,
-  ) {
-    emit(ConversationSpeaking());
+    try {
+      final response = await sendMessageUsecase.post(event.text);
+
+      emit(ConversationSpeaking(response.replyText, mode: state.mode));
+    } catch (e) {
+      debugPrint('Error sending message: $e');
+      emit(
+        ConversationError(
+          'Failed to reach Amadeus. Try again.',
+          mode: state.mode,
+        ),
+      );
+    }
   }
 
   void _onSpeakingFinished(
     SpeakingFinishedEvent event,
     Emitter<ConversationState> emit,
   ) {
-    emit(ConversationIdle());
+    emit(ConversationIdle(mode: state.mode));
   }
 
   void _onConversationFailed(
     ConversationFailedEvent event,
     Emitter<ConversationState> emit,
   ) {
-    emit(ConversationError(event.message));
+    emit(ConversationError(event.message, mode: state.mode));
+  }
+  // ====================================
+
+  Future<void> _onChangeMode(
+    ChangeInteractionModeEvent event,
+    Emitter<ConversationState> emit,
+  ) async {
+    await cacheHelper.saveInteractionMode(event.newMode);
+    emit(ConversationIdle(mode: event.newMode));
   }
 }

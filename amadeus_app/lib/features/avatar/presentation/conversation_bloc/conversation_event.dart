@@ -12,13 +12,16 @@ final class ToggleListeningEvent extends ConversationEvent {
   ToggleListeningEvent(this.isListening);
 }
 
-/// The user finished speaking/typing — we now wait on the AI.
-final class StartThinkingEvent extends ConversationEvent {}
+/// The user sent a message (typed or spoken) — this is what
+/// actually triggers the AI call.
+final class SendUserMessageEvent extends ConversationEvent {
+  final String text;
+  SendUserMessageEvent(this.text);
+}
 
-/// The AI responded successfully with some text to speak.
-final class ResponseReceivedEvent extends ConversationEvent {
-  final String response;
-  ResponseReceivedEvent(this.response);
+final class ChangeInteractionModeEvent extends ConversationEvent {
+  final InteractionMode newMode;
+  ChangeInteractionModeEvent(this.newMode);
 }
 
 /// The avatar finished speaking the response, back to idle.

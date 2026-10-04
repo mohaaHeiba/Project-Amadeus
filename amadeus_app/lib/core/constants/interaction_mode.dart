@@ -1,0 +1,1 @@
+enum InteractionMode { voice, text }

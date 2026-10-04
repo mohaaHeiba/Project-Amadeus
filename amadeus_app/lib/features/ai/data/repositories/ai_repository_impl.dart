@@ -1,4 +1,5 @@
 import 'package:amadeus_app/features/ai/data/datasources/groq_datasource.dart';
+import 'package:amadeus_app/features/ai/data/model/groq_response_model.dart';
 import 'package:amadeus_app/features/ai/domain/repositories/ai_repository.dart';
 
 class AiRepositoryImpl extends AiRepository {
@@ -7,11 +8,7 @@ class AiRepositoryImpl extends AiRepository {
   AiRepositoryImpl({required this.groqDatasource});
 
   @override
-  Future<void> post(String text) async {
-    try {
-      await groqDatasource.post(text);
-    } catch (e) {
-      print(e);
-    }
+  Future<GroqResponseModel> post(String text) async {
+    return await groqDatasource.post(text);
   }
 }

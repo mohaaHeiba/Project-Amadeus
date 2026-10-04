@@ -36,9 +36,12 @@ class AppRoutes {
         builder: (context, state) => MultiBlocProvider(
           providers: [
             BlocProvider(create: (context) => AvatarBloc()),
-            BlocProvider(create: (context) => ConversationBloc()),
+            BlocProvider(
+              create: (context) =>
+                  ConversationBloc(sendMessageUsecase: sl(), cacheHelper: sl()),
+            ),
           ],
-          child: HomeScreen(sendMessageUsecase: sl()),
+          child: HomeScreen(),
         ),
       ),
 
