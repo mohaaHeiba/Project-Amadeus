@@ -1,5 +1,6 @@
 import 'package:amadeus_app/core/constants/interaction_mode.dart';
 import 'package:amadeus_app/core/services/cache_helper.dart';
+import 'package:amadeus_app/features/ai/data/model/chat_message.dart';
 import 'package:amadeus_app/features/ai/domain/usecases/send_message_usecase.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -45,7 +46,7 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
     emit(ConversationThinking(mode: state.mode));
 
     try {
-      final response = await sendMessageUsecase.post(event.text);
+      final response = await sendMessageUsecase.post(event.messages);
 
       emit(ConversationSpeaking(response.replyText, mode: state.mode));
     } catch (e) {

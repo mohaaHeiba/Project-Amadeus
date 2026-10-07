@@ -5,35 +5,45 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 Widget homeMicButton(BuildContext context, InteractionMode isInteractionMode) {
+  void toggleMode() {
+    final newMode = isInteractionMode == InteractionMode.voice
+        ? InteractionMode.text
+        : InteractionMode.voice;
+
+    context.read<ConversationBloc>().add(ChangeInteractionModeEvent(newMode));
+  }
+
   return BlocBuilder<ConversationBloc, ConversationState>(
     builder: (context, conversationState) {
       final isListening = conversationState is ConversationListening;
 
       return GestureDetector(
-        onTap: () {
+        onTap: () async {
           context.read<ConversationBloc>().add(
             ToggleListeningEvent(!isListening),
           );
+
+          toggleMode();
         },
         child: Container(
           height: 60,
           width: 60,
           decoration: BoxDecoration(
-            color: const Color(0xFF1E1E1E).withOpacity(0.95),
+            color: const Color(0xFF1E1E1E).withValues(alpha: 0.95),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: AppColors.primary.withOpacity(0.4),
+              color: AppColors.primary.withValues(alpha: 0.4),
               width: 1,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.5),
+                color: Colors.black.withValues(alpha: 0.5),
                 blurRadius: 10,
                 offset: const Offset(0, 5),
               ),
               if (isListening)
                 BoxShadow(
-                  color: AppColors.primary.withOpacity(0.2),
+                  color: AppColors.primary.withValues(alpha: 0.2),
                   blurRadius: 20,
                   offset: const Offset(0, 0),
                 ),

@@ -6,8 +6,13 @@ import 'package:flutter/material.dart';
 final class GlitchPaint extends CustomPainter {
   final double progress;
   final int seed;
+  final int sizeGlitch;
 
-  GlitchPaint({required this.progress, required this.seed});
+  GlitchPaint({
+    required this.progress,
+    required this.seed,
+    this.sizeGlitch = 5,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -23,8 +28,8 @@ final class GlitchPaint extends CustomPainter {
     for (int i = 0; i < blockCount; i++) {
       double x = random.nextDouble() * size.width;
       double y = random.nextDouble() * size.height;
-      double width = 5 + random.nextDouble() * 25;
-      double height = 5 + random.nextDouble() * 25;
+      double width = sizeGlitch + random.nextDouble() * 25;
+      double height = sizeGlitch + random.nextDouble() * 25;
 
       Paint currentPaint = random.nextInt(10) > 8 ? amberPaint : bgPaint;
 

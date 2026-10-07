@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:amadeus_app/features/ai/data/model/choice_model.dart';
 import 'package:amadeus_app/features/ai/data/model/usage_model.dart';
 
@@ -53,7 +55,22 @@ class GroqResponseModel {
     );
   }
 
-  /// Convenience getter: the actual AI reply text, since that's
-  /// what the rest of the app will want 90% of the time.
-  String get replyText => choices.first.message.content;
+  Map<String, dynamic> get parsedContent {
+    final rawContent = choices.first.message.content;
+    try {
+      return jsonDecode(rawContent) as Map<String, dynamic>;
+    } catch (e) {
+      // Fallback in case the model returns malformed JSON or plain text
+      return {'text': rawContent, 'emotion': 'neutral'};
+    }
+  }
+
+  // 1. Getter for All
+  String get reply => choices.first.message.content;
+
+  // 2. Getter for the text
+  String get replyText => parsedContent['text'] ?? '';
+
+  // 3. Getter for the emotion
+  String get replyemotion => parsedContent['emotion'] ?? 'neutral';
 }

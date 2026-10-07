@@ -1,4 +1,5 @@
 import 'package:amadeus_app/core/theme/app_colors.dart';
+import 'package:amadeus_app/features/ai/data/model/chat_message.dart';
 import 'package:amadeus_app/features/avatar/presentation/conversation_bloc/conversation_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -22,7 +23,9 @@ class HomeTextInputAreaState extends State<HomeTextInputArea> {
   void _sendMessage() {
     final text = _controller.text.trim();
     if (text.isNotEmpty) {
-      context.read<ConversationBloc>().add(SendUserMessageEvent(text));
+      final userMessage = ChatMessage(role: 'user', content: text);
+      final List<ChatMessage> messages = [userMessage];
+      context.read<ConversationBloc>().add(SendUserMessageEvent(messages));
       _controller.clear();
     }
   }
@@ -39,11 +42,11 @@ class HomeTextInputAreaState extends State<HomeTextInputArea> {
             decoration: InputDecoration(
               hintText: "Type a message...",
               hintStyle: TextStyle(
-                color: Colors.grey.withOpacity(0.6),
+                color: Colors.grey.withValues(alpha: 0.6),
                 fontFamily: 'Courier',
               ),
               filled: true,
-              fillColor: Colors.black.withOpacity(0.3),
+              fillColor: Colors.black.withValues(alpha: 0.3),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 12,
@@ -51,7 +54,7 @@ class HomeTextInputAreaState extends State<HomeTextInputArea> {
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
                 borderSide: BorderSide(
-                  color: AppColors.primary.withOpacity(0.3),
+                  color: AppColors.primary.withValues(alpha: 0.3),
                 ),
               ),
               focusedBorder: OutlineInputBorder(
@@ -61,7 +64,7 @@ class HomeTextInputAreaState extends State<HomeTextInputArea> {
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
                 borderSide: BorderSide(
-                  color: AppColors.primary.withOpacity(0.3),
+                  color: AppColors.primary.withValues(alpha: 0.3),
                 ),
               ),
             ),
@@ -74,9 +77,11 @@ class HomeTextInputAreaState extends State<HomeTextInputArea> {
           child: Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
+              color: AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: AppColors.primary.withOpacity(0.5)),
+              border: Border.all(
+                color: AppColors.primary.withValues(alpha: 0.5),
+              ),
             ),
             child: const Icon(Icons.send, color: AppColors.primary, size: 20),
           ),

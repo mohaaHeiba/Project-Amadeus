@@ -19,6 +19,15 @@ class _HomeScreenState extends State<HomeScreen>
   late final AnimationController controller;
 
   @override
+  void initState() {
+    super.initState();
+    controller = AnimationController(
+      duration: const Duration(seconds: 5),
+      vsync: this,
+    )..forward();
+  }
+
+  @override
   void dispose() {
     controller.dispose();
     super.dispose();
@@ -44,6 +53,20 @@ class _HomeScreenState extends State<HomeScreen>
       child: Scaffold(
         body: Stack(
           children: [
+            customBackground(context),
+            SafeArea(
+              bottom: false,
+              child: Column(
+                children: [
+                  Expanded(child: AvatarScreen()),
+                  BlocBuilder<ConversationBloc, ConversationState>(
+                    builder: (context, state) {
+                      return HomeSpeechBubble(isInteractionMode: state.mode);
+                    },
+                  ),
+                ],
+              ),
+            ),
             // animtain for error
             if (error == true)
               AnimatedBuilder(
@@ -53,25 +76,12 @@ class _HomeScreenState extends State<HomeScreen>
                     size: size,
                     painter: GlitchPaint(
                       progress: controller.value,
-                      seed: (controller.value * 18).toInt(),
+                      seed: (controller.value * 60).toInt(),
+                      sizeGlitch: 15,
                     ),
                   );
                 },
               ),
-            customBackground(context),
-            SafeArea(
-              bottom: false,
-              child: Column(
-                children: [
-                  const Expanded(child: AvatarScreen()),
-                  BlocBuilder<ConversationBloc, ConversationState>(
-                    builder: (context, state) {
-                      return HomeSpeechBubble(isInteractionMode: state.mode);
-                    },
-                  ),
-                ],
-              ),
-            ),
           ],
         ),
       ),

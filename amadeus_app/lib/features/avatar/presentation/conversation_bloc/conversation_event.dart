@@ -15,8 +15,8 @@ final class ToggleListeningEvent extends ConversationEvent {
 /// The user sent a message (typed or spoken) — this is what
 /// actually triggers the AI call.
 final class SendUserMessageEvent extends ConversationEvent {
-  final String text;
-  SendUserMessageEvent(this.text);
+  final List<ChatMessage> messages;
+  SendUserMessageEvent(this.messages);
 }
 
 final class ChangeInteractionModeEvent extends ConversationEvent {
