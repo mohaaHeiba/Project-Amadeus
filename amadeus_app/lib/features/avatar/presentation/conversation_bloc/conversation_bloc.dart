@@ -11,6 +11,7 @@ part 'conversation_state.dart';
 class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
   final SendMessageUsecase sendMessageUsecase;
   final CacheHelper cacheHelper;
+  final List<ChatMessage> chatHistory = [];
 
   ConversationBloc({
     required this.sendMessageUsecase,
@@ -45,8 +46,16 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
   ) async {
     emit(ConversationThinking(mode: state.mode));
 
+    chatHistory.addAll(event.messages);
     try {
-      final response = await sendMessageUsecase.post(event.messages);
+      final response = await sendMessageUsecase.post(chatHistory);
+
+      chatHistory.add(
+        ChatMessage(
+          role: 'assistant',
+          content: response.choices.first.message.content,
+        ),
+      );
 
       emit(ConversationSpeaking(response.replyText, mode: state.mode));
     } catch (e) {
