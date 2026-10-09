@@ -32,7 +32,13 @@ final class ConversationThinking extends ConversationState {
 /// Now carries the actual reply text so the UI can display it.
 final class ConversationSpeaking extends ConversationState {
   final String replyText;
-  const ConversationSpeaking(this.replyText, {required super.mode});
+  final String emotion;
+
+  const ConversationSpeaking(
+    this.replyText,
+    this.emotion, {
+    required super.mode,
+  });
 }
 
 /// Something failed (e.g. the AI API call failed).

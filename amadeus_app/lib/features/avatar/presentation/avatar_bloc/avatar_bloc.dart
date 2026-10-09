@@ -1,4 +1,6 @@
+import 'package:amadeus_app/core/constants/avatar_emotion.dart';
 import 'package:amadeus_app/features/avatar/data/model/rive_input_names.dart';
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -13,6 +15,7 @@ class AvatarBloc extends Bloc<AvatarEvent, AvatarState> {
     on<ToggleShakingHeadEvent>(_onToggleShakingHead);
     on<ToggleCheckingOnUserEvent>(_onToggleCheckingOnUser);
     on<UpdateMouthValueEvent>(_onUpdateMouthValue);
+    on<UpdateEmotionEvent>(_onUpdateEmotion, transformer: restartable());
   }
 
   void _onToggleAngry(ToggleAngryEvent event, Emitter<AvatarState> emit) {
@@ -49,5 +52,30 @@ class AvatarBloc extends Bloc<AvatarEvent, AvatarState> {
     Emitter<AvatarState> emit,
   ) {
     emit(state.copyWith(mouthValue: event.value));
+  }
+
+  Future<void> _onUpdateEmotion(
+    UpdateEmotionEvent event,
+    Emitter<AvatarState> emit,
+  ) async {
+    emit(
+      state.copyWith(
+        isAngry: event.emotion == 'angry',
+        isBlushing: event.emotion == 'blushing',
+        isHandToChest: event.emotion == 'handToChest',
+        isShakingHead: event.emotion == 'shakingHead',
+        isCheckingOnUser: event.emotion == 'checkingOnUser',
+      ),
+    );
+    await Future.delayed(const Duration(seconds: 3));
+    emit(
+      state.copyWith(
+        isAngry: false,
+        isBlushing: false,
+        isHandToChest: false,
+        isShakingHead: false,
+        isCheckingOnUser: false,
+      ),
+    );
   }
 }

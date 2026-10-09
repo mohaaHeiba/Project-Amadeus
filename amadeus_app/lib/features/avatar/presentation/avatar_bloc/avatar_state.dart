@@ -36,6 +36,20 @@ class AvatarState {
     );
   }
 
+  factory AvatarState.fromEmotion(
+    AvatarEmotion emotion, {
+    double mouthValue = 0.0,
+  }) {
+    return AvatarState(
+      isAngry: emotion == AvatarEmotion.angry,
+      isHandToChest: emotion == AvatarEmotion.handToChest,
+      isBlushing: emotion == AvatarEmotion.blushing,
+      isShakingHead: emotion == AvatarEmotion.shakingHead,
+      isCheckingOnUser: emotion == AvatarEmotion.checkingOnUser,
+      mouthValue: mouthValue,
+    );
+  }
+
   Map<String, dynamic> toRiveInputsMap() {
     return {
       RiveInputNames.angry: isAngry,

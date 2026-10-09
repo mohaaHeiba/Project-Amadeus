@@ -33,6 +33,12 @@ final class ToggleCheckingOnUserEvent extends AvatarEvent {
   ToggleCheckingOnUserEvent(this.value);
 }
 
+final class UpdateEmotionEvent extends AvatarEvent {
+  final String emotion;
+
+  UpdateEmotionEvent(this.emotion);
+}
+
 /// Update the mouth value (0-100) for lip-sync.
 final class UpdateMouthValueEvent extends AvatarEvent {
   final double value;

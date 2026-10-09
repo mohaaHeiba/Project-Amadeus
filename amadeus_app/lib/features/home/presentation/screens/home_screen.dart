@@ -1,6 +1,7 @@
 import 'package:amadeus_app/core/utils/custom_snackbar.dart';
 import 'package:amadeus_app/core/widgets/custom_background/custom_background.dart';
 import 'package:amadeus_app/core/widgets/custom_background/widgets/glitch_painter.dart';
+import 'package:amadeus_app/features/avatar/presentation/avatar_bloc/avatar_bloc.dart';
 import 'package:amadeus_app/features/avatar/presentation/conversation_bloc/conversation_bloc.dart';
 import 'package:amadeus_app/features/avatar/presentation/screens/avatar_screen.dart';
 import 'package:amadeus_app/features/home/presentation/widgets/home_speech_bubble.dart';
@@ -18,13 +19,22 @@ class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController controller;
 
+  bool hasError = false;
+
   @override
   void initState() {
     super.initState();
+
     controller = AnimationController(
-      duration: const Duration(seconds: 5),
       vsync: this,
-    )..forward();
+      duration: const Duration(seconds: 5),
+    );
+
+    controller.addStatusListener((s) {
+      if (s == AnimationStatus.completed && mounted) {
+        setState(() => hasError = false);
+      }
+    });
   }
 
   @override
@@ -35,20 +45,24 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    bool error = false;
     final size = MediaQuery.sizeOf(context);
 
     return BlocListener<ConversationBloc, ConversationState>(
       listener: (context, state) {
         if (state is ConversationError) {
-          error = true;
+          setState(() => hasError = true);
+          controller.forward(from: 0);
+
           CustomSnackbar.show(
             isError: true,
             context: context,
             message: state.message,
           );
         }
-        if (state is ConversationSpeaking) {}
+
+        if (state is ConversationSpeaking) {
+          context.read<AvatarBloc>().add(UpdateEmotionEvent(state.emotion));
+        }
       },
       child: Scaffold(
         body: Stack(
@@ -58,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen>
               bottom: false,
               child: Column(
                 children: [
-                  Expanded(child: AvatarScreen()),
+                  const Expanded(child: AvatarScreen()),
                   BlocBuilder<ConversationBloc, ConversationState>(
                     builder: (context, state) {
                       return HomeSpeechBubble(isInteractionMode: state.mode);
@@ -67,20 +81,21 @@ class _HomeScreenState extends State<HomeScreen>
                 ],
               ),
             ),
-            // animtain for error
-            if (error == true)
-              AnimatedBuilder(
-                animation: controller,
-                builder: (context, child) {
-                  return CustomPaint(
-                    size: size,
-                    painter: GlitchPaint(
-                      progress: controller.value,
-                      seed: (controller.value * 60).toInt(),
-                      sizeGlitch: 15,
-                    ),
-                  );
-                },
+            if (hasError)
+              IgnorePointer(
+                child: AnimatedBuilder(
+                  animation: controller,
+                  builder: (context, child) {
+                    return CustomPaint(
+                      size: size,
+                      painter: GlitchPaint(
+                        progress: controller.value,
+                        seed: (controller.value * 60).toInt(),
+                        sizeGlitch: 15,
+                      ),
+                    );
+                  },
+                ),
               ),
           ],
         ),

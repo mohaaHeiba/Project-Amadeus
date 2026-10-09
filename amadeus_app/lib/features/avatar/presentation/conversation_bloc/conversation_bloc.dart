@@ -57,7 +57,13 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
         ),
       );
 
-      emit(ConversationSpeaking(response.replyText, mode: state.mode));
+      emit(
+        ConversationSpeaking(
+          response.replyText,
+          response.replyemotion,
+          mode: state.mode,
+        ),
+      );
     } catch (e) {
       debugPrint('Error sending message: $e');
       emit(
