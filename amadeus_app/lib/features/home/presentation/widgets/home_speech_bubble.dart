@@ -1,5 +1,7 @@
 import 'package:amadeus_app/core/constants/interaction_mode.dart';
+import 'package:amadeus_app/core/services/continuous_stt_service.dart';
 import 'package:amadeus_app/core/theme/app_colors.dart';
+import 'package:amadeus_app/features/ai/data/model/chat_message.dart';
 import 'package:amadeus_app/features/avatar/presentation/conversation_bloc/conversation_bloc.dart';
 import 'package:amadeus_app/features/home/presentation/widgets/home_mic_button.dart';
 import 'package:amadeus_app/features/home/presentation/widgets/home_text_input_area.dart';
@@ -18,6 +20,43 @@ class _HomeSpeechBubbleState extends State<HomeSpeechBubble> {
   String _lastDisplayedText =
       "Good evening. Have the worldline divergence parameters shifted again?";
 
+  final ContinuousSttService _sttService = ContinuousSttService();
+
+  @override
+  void didUpdateWidget(covariant HomeSpeechBubble oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isInteractionMode != widget.isInteractionMode) {
+      _handleSttState(widget.isInteractionMode);
+    }
+  }
+
+  void _handleSttState(InteractionMode mode) {
+    if (mode == InteractionMode.voice) {
+      _sttService.start(
+        onResult: (text) {
+          setState(() {
+            _lastDisplayedText = text;
+          });
+        },
+        onFinalResult: (finalWord) {
+          context.read<ConversationBloc>().add(
+            SendUserMessageEvent([
+              ChatMessage(role: 'user', content: finalWord),
+            ]),
+          );
+        },
+      );
+    } else {
+      _sttService.stop();
+    }
+  }
+
+  @override
+  void dispose() {
+    _sttService.stop();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<ConversationBloc, ConversationState>(
@@ -26,6 +65,17 @@ class _HomeSpeechBubbleState extends State<HomeSpeechBubble> {
           setState(() {
             _lastDisplayedText = state.replyText;
           });
+          _sttService.stop();
+
+          Future.delayed(const Duration(seconds: 4), () {
+            if (widget.isInteractionMode == InteractionMode.voice && mounted) {
+              _handleSttState(InteractionMode.voice);
+            }
+          });
+        }
+        if (state is ConversationListening &&
+            widget.isInteractionMode == InteractionMode.voice) {
+          _handleSttState(InteractionMode.voice);
         }
       },
       child: SafeArea(
