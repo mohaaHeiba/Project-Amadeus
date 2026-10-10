@@ -1,3 +1,4 @@
+import 'package:amadeus_app/core/theme/app_colors.dart';
 import 'package:amadeus_app/core/utils/custom_snackbar.dart';
 import 'package:amadeus_app/core/widgets/custom_background/custom_background.dart';
 import 'package:amadeus_app/core/widgets/custom_background/widgets/glitch_painter.dart';
@@ -60,6 +61,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   void dispose() {
     controller.dispose();
+    pulseController.dispose();
     super.dispose();
   }
 
@@ -70,9 +72,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return BlocListener<ConversationBloc, ConversationState>(
       listener: (context, state) {
         if (state is ConversationError) {
-          setState(() => hasError = true);
+          setState(() {
+            hasError = true;
+            condition = AppColors.onError;
+          });
           controller.forward(from: 0);
-
           CustomSnackbar.show(
             isError: true,
             context: context,
@@ -104,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
                     final dynamicBlur = 80.0 + (pulseValue * 40.0);
                     final dynamicSpread = 25.0 + (pulseValue * 25.0);
-                    final dynamicAlpha = 0.4 + (pulseValue * 0.25);
+                    final dynamicAlpha = 0.6 + (pulseValue * 0.25);
                     return AnimatedContainer(
                       duration: const Duration(milliseconds: 400),
                       width: 280,

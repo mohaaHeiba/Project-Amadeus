@@ -3,7 +3,7 @@ import 'package:amadeus_app/core/services/continuous_stt_service.dart';
 import 'package:amadeus_app/core/theme/app_colors.dart';
 import 'package:amadeus_app/features/ai/data/model/chat_message.dart';
 import 'package:amadeus_app/features/avatar/presentation/conversation_bloc/conversation_bloc.dart';
-import 'package:amadeus_app/features/home/presentation/widgets/home_mic_button.dart';
+import 'package:amadeus_app/features/home/presentation/widgets/home_mic_button.dart'; // مسار الكلاس الجديد
 import 'package:amadeus_app/features/home/presentation/widgets/home_text_input_area.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -19,7 +19,7 @@ class HomeSpeechBubble extends StatefulWidget {
 class _HomeSpeechBubbleState extends State<HomeSpeechBubble> {
   String _lastDisplayedText =
       "Good evening. Have the worldline divergence parameters shifted again?";
-
+  String stateText = "■ AMADEUS // KURISU";
   final ContinuousSttService _sttService = ContinuousSttService();
 
   @override
@@ -62,16 +62,7 @@ class _HomeSpeechBubbleState extends State<HomeSpeechBubble> {
     return BlocListener<ConversationBloc, ConversationState>(
       listener: (context, state) {
         if (state is ConversationSpeaking) {
-          setState(() {
-            _lastDisplayedText = state.replyText;
-          });
           _sttService.stop();
-
-          Future.delayed(const Duration(seconds: 4), () {
-            if (widget.isInteractionMode == InteractionMode.voice && mounted) {
-              _handleSttState(InteractionMode.voice);
-            }
-          });
         }
         if (state is ConversationListening &&
             widget.isInteractionMode == InteractionMode.voice) {
@@ -106,8 +97,8 @@ class _HomeSpeechBubbleState extends State<HomeSpeechBubble> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      "■ AMADEUS // KURISU",
+                    Text(
+                      stateText,
                       style: TextStyle(
                         color: AppColors.primary,
                         fontSize: 12,
@@ -131,6 +122,14 @@ class _HomeSpeechBubbleState extends State<HomeSpeechBubble> {
                           textColor = Colors.grey;
                         } else if (state is ConversationSpeaking) {
                           displayText = state.replyText;
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            if (mounted &&
+                                _lastDisplayedText != state.replyText) {
+                              setState(
+                                () => _lastDisplayedText = state.replyText,
+                              );
+                            }
+                          });
                         } else if (state is ConversationError) {
                           displayText = "ERR: ${state.message}";
                           textColor = Colors.redAccent;
@@ -166,7 +165,9 @@ class _HomeSpeechBubbleState extends State<HomeSpeechBubble> {
                 right: 0,
                 child: Align(
                   alignment: Alignment.center,
-                  child: homeMicButton(context, widget.isInteractionMode),
+                  child: HomeMicButton(
+                    isInteractionMode: widget.isInteractionMode,
+                  ),
                 ),
               ),
             ],
