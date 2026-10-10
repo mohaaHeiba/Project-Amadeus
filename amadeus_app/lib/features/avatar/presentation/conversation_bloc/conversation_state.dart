@@ -33,10 +33,12 @@ final class ConversationThinking extends ConversationState {
 final class ConversationSpeaking extends ConversationState {
   final String replyText;
   final String emotion;
+  final String color;
 
   const ConversationSpeaking(
     this.replyText,
-    this.emotion, {
+    this.emotion,
+    this.color, {
     required super.mode,
   });
 }

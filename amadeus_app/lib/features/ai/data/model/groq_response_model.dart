@@ -61,7 +61,7 @@ class GroqResponseModel {
       return jsonDecode(rawContent) as Map<String, dynamic>;
     } catch (e) {
       // Fallback in case the model returns malformed JSON or plain text
-      return {'text': rawContent, 'emotion': 'neutral'};
+      return {'text': rawContent, 'emotion': 'neutral', 'color': '0x00000000'};
     }
   }
 
@@ -73,4 +73,6 @@ class GroqResponseModel {
 
   // 3. Getter for the emotion
   String get replyemotion => parsedContent['emotion'] ?? 'neutral';
+  // 3. Getter for the emotion
+  String get replyColor => parsedContent['color'] ?? '0x00000000';
 }

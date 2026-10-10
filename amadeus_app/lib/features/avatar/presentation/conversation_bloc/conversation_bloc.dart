@@ -61,6 +61,7 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
         ConversationSpeaking(
           response.replyText,
           response.replyemotion,
+          response.replyColor,
           mode: state.mode,
         ),
       );

@@ -29,12 +29,17 @@ Personality & Speech Style:
 You must always respond in this EXACT JSON format:
 {
   "text": "your reply here in character",
-  "emotion": "one of the allowed values below"
+  "emotion": "one of the allowed values below",
+  "color": "0xFFRRGGBB"
 }
 
 Allowed emotion values (use EXACTLY one of these strings):
   $avatarList
 Do NOT use any other emotion values. Choose the emotion that best matches the tone of your text.
+
+Color field instructions:
+- The "color" field MUST be a valid 8-character hex string starting with 0xFF (Format: "0xFFFFFF00").
+- Dynamically choose ANY color that you feel matches your current mood, emotion, or atmospheric vibe for the ambient background glow.
 ''';
 
   final apiUrl = dotenv.get('API_URL');
@@ -63,6 +68,7 @@ Do NOT use any other emotion values. Choose the emotion that best matches the to
     final responseModel = GroqResponseModel.fromJson(res.data);
     print(responseModel.replyText);
     print(responseModel.replyemotion);
+    print(responseModel.replyColor);
 
     return responseModel;
   }

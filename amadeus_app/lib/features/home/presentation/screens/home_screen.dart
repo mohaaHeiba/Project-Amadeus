@@ -15,10 +15,10 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
-    with SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late final AnimationController controller;
-
+  late final AnimationController pulseController;
+  Color condition = Colors.transparent;
   bool hasError = false;
 
   @override
@@ -35,6 +35,26 @@ class _HomeScreenState extends State<HomeScreen>
         setState(() => hasError = false);
       }
     });
+
+    pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    )..repeat(reverse: true);
+  }
+
+  Color _parseHexColor(String? hexString) {
+    if (hexString == null) return const Color(0x00000000);
+    try {
+      final cleanHex = hexString
+          .replaceAll('0x', '')
+          .replaceAll('0X', '')
+          .replaceAll('#', '');
+      return Color(
+        int.parse(cleanHex.length == 6 ? 'FF$cleanHex' : cleanHex, radix: 16),
+      );
+    } catch (_) {
+      return const Color(0x00000000);
+    }
   }
 
   @override
@@ -61,6 +81,7 @@ class _HomeScreenState extends State<HomeScreen>
         }
 
         if (state is ConversationSpeaking) {
+          setState(() => condition = _parseHexColor(state.color));
           context.read<AvatarBloc>().add(UpdateEmotionEvent(state.emotion));
         }
       },
@@ -68,6 +89,43 @@ class _HomeScreenState extends State<HomeScreen>
         body: Stack(
           children: [
             customBackground(context),
+
+            Positioned(
+              top: size.height * 0.16,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: AnimatedBuilder(
+                  animation: pulseController,
+                  builder: (context, child) {
+                    final pulseValue = Curves.easeInOutSine.transform(
+                      pulseController.value,
+                    );
+
+                    final dynamicBlur = 80.0 + (pulseValue * 40.0);
+                    final dynamicSpread = 25.0 + (pulseValue * 25.0);
+                    final dynamicAlpha = 0.4 + (pulseValue * 0.25);
+                    return AnimatedContainer(
+                      duration: const Duration(milliseconds: 400),
+                      width: 280,
+                      height: 280,
+                      curve: Curves.easeInOutCubic,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: condition.withValues(alpha: dynamicAlpha),
+                            blurRadius: dynamicBlur,
+                            spreadRadius: dynamicSpread,
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+
             SafeArea(
               bottom: false,
               child: Column(
@@ -81,6 +139,7 @@ class _HomeScreenState extends State<HomeScreen>
                 ],
               ),
             ),
+
             if (hasError)
               IgnorePointer(
                 child: AnimatedBuilder(

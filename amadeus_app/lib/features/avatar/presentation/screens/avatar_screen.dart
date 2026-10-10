@@ -52,47 +52,43 @@ class _AvatarScreenState extends State<AvatarScreen> {
         _syncRiveInputs(avatarState);
       },
       builder: (context, avatarState) {
-        return Scaffold(
-          body: Stack(
-            children: [
-              Center(
-                child: FractionallySizedBox(
-                  heightFactor: 1,
-                  child: RiveWidgetBuilder(
-                    fileLoader: fileLoader,
-                    stateMachineSelector: StateMachineSelector.byName(
-                      'State Machine 2',
-                    ),
-                    builder: (context, riveState) {
-                      switch (riveState) {
-                        case RiveLoading():
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-
-                        case RiveFailed():
-                          return ErrorWidget.withDetails(
-                            message: riveState.error.toString(),
-                            error: FlutterError(riveState.error.toString()),
-                          );
-
-                        case RiveLoaded():
-                          _amadeusController = riveState.controller;
-                          WidgetsBinding.instance.addPostFrameCallback((_) {
-                            _syncRiveInputs(avatarState);
-                          });
-                          return RiveWidget(
-                            controller: riveState.controller,
-                            fit: Fit.contain,
-                          );
-                      }
-                    },
+        return Stack(
+          children: [
+            Center(
+              child: FractionallySizedBox(
+                heightFactor: 1,
+                child: RiveWidgetBuilder(
+                  fileLoader: fileLoader,
+                  stateMachineSelector: StateMachineSelector.byName(
+                    'State Machine 2',
                   ),
+                  builder: (context, riveState) {
+                    switch (riveState) {
+                      case RiveLoading():
+                        return const Center(child: CircularProgressIndicator());
+
+                      case RiveFailed():
+                        return ErrorWidget.withDetails(
+                          message: riveState.error.toString(),
+                          error: FlutterError(riveState.error.toString()),
+                        );
+
+                      case RiveLoaded():
+                        _amadeusController = riveState.controller;
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          _syncRiveInputs(avatarState);
+                        });
+                        return RiveWidget(
+                          controller: riveState.controller,
+                          fit: Fit.contain,
+                        );
+                    }
+                  },
                 ),
               ),
-              customBackground(context),
-            ],
-          ),
+            ),
+            customBackground(context),
+          ],
         );
       },
     );
