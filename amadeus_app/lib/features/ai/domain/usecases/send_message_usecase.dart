@@ -1,5 +1,6 @@
-import 'package:amadeus_app/features/ai/data/models/chat_message.dart';
-import 'package:amadeus_app/features/ai/data/models/groq_response_model.dart';
+import 'package:amadeus_app/features/ai/domain/entities/ai_reply.dart';
+import 'package:amadeus_app/features/ai/domain/entities/chat_message.dart';
+import 'package:amadeus_app/features/ai/domain/prompts/amadeus_system_prompt.dart';
 import 'package:amadeus_app/features/ai/domain/repositories/ai_repository.dart';
 
 class SendMessageUsecase {
@@ -7,7 +8,17 @@ class SendMessageUsecase {
 
   SendMessageUsecase({required this.aiRepository});
 
-  Future<GroqResponseModel> post(List<ChatMessage> messages) async {
-    return aiRepository.post(messages);
+  Future<AiReply> call({
+    required List<ChatMessage> history,
+    required String operatorName,
+  }) {
+    final messages = [
+      ChatMessage(
+        role: ChatRole.system,
+        content: buildSystemPrompt(operatorName: operatorName),
+      ),
+      ...history,
+    ];
+    return aiRepository.sendMessage(messages);
   }
 }

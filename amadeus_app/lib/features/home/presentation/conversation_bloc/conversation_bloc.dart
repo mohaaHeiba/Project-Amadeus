@@ -1,7 +1,9 @@
+import 'package:amadeus_app/core/constants/avatar_emotion.dart';
 import 'package:amadeus_app/core/constants/interaction_mode.dart';
 import 'package:amadeus_app/core/services/cache_helper.dart';
-import 'package:amadeus_app/features/ai/data/models/chat_message.dart';
+import 'package:amadeus_app/features/ai/domain/entities/chat_message.dart';
 import 'package:amadeus_app/features/ai/domain/usecases/send_message_usecase.dart';
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -11,7 +13,9 @@ part 'conversation_state.dart';
 class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
   final SendMessageUsecase sendMessageUsecase;
   final CacheHelper cacheHelper;
-  final List<ChatMessage> chatHistory = [];
+
+  final List<ChatMessage> _chatHistory = [];
+  static const int _maxHistory = 20;
 
   ConversationBloc({
     required this.sendMessageUsecase,
@@ -19,7 +23,7 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
   }) : super(ConversationInitial(mode: cacheHelper.getInteractionMode)) {
     on<AppReadyEvent>(_onAppReady);
     on<ToggleListeningEvent>(_onToggleListening);
-    on<SendUserMessageEvent>(_onSendUserMessage);
+    on<SendUserMessageEvent>(_onSendUserMessage, transformer: droppable());
     on<SpeakingFinishedEvent>(_onSpeakingFinished);
     on<ConversationFailedEvent>(_onConversationFailed);
     on<ChangeInteractionModeEvent>(_onChangeMode);
@@ -46,22 +50,26 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
   ) async {
     emit(ConversationThinking(mode: state.mode));
 
-    chatHistory.addAll(event.messages);
-    try {
-      final response = await sendMessageUsecase.post(chatHistory);
+    final userMessage = ChatMessage(role: ChatRole.user, content: event.text);
 
-      chatHistory.add(
-        ChatMessage(
-          role: 'assistant',
-          content: response.choices.first.message.content,
-        ),
+    try {
+      final reply = await sendMessageUsecase(
+        history: [..._chatHistory, userMessage],
+        operatorName: cacheHelper.getOperatorName,
       );
+
+      _chatHistory
+        ..add(userMessage)
+        ..add(ChatMessage(role: ChatRole.assistant, content: reply.raw));
+      if (_chatHistory.length > _maxHistory) {
+        _chatHistory.removeRange(0, _chatHistory.length - _maxHistory);
+      }
 
       emit(
         ConversationSpeaking(
-          response.replyText,
-          response.replyemotion,
-          response.replyColor,
+          reply.text,
+          reply.emotion,
+          reply.color,
           mode: state.mode,
         ),
       );
@@ -89,7 +97,6 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
   ) {
     emit(ConversationError(event.message, mode: state.mode));
   }
-  // ====================================
 
   Future<void> _onChangeMode(
     ChangeInteractionModeEvent event,

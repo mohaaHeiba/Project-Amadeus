@@ -58,23 +58,14 @@ class AvatarBloc extends Bloc<AvatarEvent, AvatarState> {
     UpdateEmotionEvent event,
     Emitter<AvatarState> emit,
   ) async {
-    emit(
-      state.copyWith(
-        isAngry: event.emotion == 'angry',
-        isBlushing: event.emotion == 'blushing',
-        isHandToChest: event.emotion == 'handToChest',
-        isShakingHead: event.emotion == 'shakingHead',
-        isCheckingOnUser: event.emotion == 'checkingOnUser',
-      ),
-    );
+    emit(AvatarState.fromEmotion(event.emotion, mouthValue: state.mouthValue));
+
     await Future.delayed(const Duration(seconds: 3));
+
     emit(
-      state.copyWith(
-        isAngry: false,
-        isBlushing: false,
-        isHandToChest: false,
-        isShakingHead: false,
-        isCheckingOnUser: false,
+      AvatarState.fromEmotion(
+        AvatarEmotion.neutral,
+        mouthValue: state.mouthValue,
       ),
     );
   }

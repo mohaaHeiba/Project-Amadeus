@@ -34,7 +34,7 @@ final class ToggleCheckingOnUserEvent extends AvatarEvent {
 }
 
 final class UpdateEmotionEvent extends AvatarEvent {
-  final String emotion;
+  final AvatarEmotion emotion;
 
   UpdateEmotionEvent(this.emotion);
 }

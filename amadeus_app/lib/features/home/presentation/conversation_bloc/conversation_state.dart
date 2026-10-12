@@ -13,7 +13,6 @@ final class ConversationInitial extends ConversationState {
 }
 
 /// Resting state: not listening, not thinking, not speaking.
-/// The avatar is just waiting for the user to do something.
 final class ConversationIdle extends ConversationState {
   const ConversationIdle({required super.mode});
 }
@@ -28,11 +27,10 @@ final class ConversationThinking extends ConversationState {
   const ConversationThinking({required super.mode});
 }
 
-/// The avatar is currently speaking the AI's response.
-/// Now carries the actual reply text so the UI can display it.
+/// The avatar is speaking the AI's response, with the emotion to play.
 final class ConversationSpeaking extends ConversationState {
   final String replyText;
-  final String emotion;
+  final AvatarEmotion emotion;
   final String color;
 
   const ConversationSpeaking(
