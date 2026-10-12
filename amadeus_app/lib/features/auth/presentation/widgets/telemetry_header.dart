@@ -1,4 +1,4 @@
-import 'package:amadeus_app/core/Extensions/spacing.dart';
+import 'package:amadeus_app/core/extensions/spacing.dart';
 import 'package:amadeus_app/core/constants/assets.dart';
 import 'package:amadeus_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';

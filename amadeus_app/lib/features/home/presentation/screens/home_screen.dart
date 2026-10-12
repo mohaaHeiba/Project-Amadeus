@@ -3,8 +3,8 @@ import 'package:amadeus_app/core/utils/custom_snackbar.dart';
 import 'package:amadeus_app/core/widgets/custom_background/custom_background.dart';
 import 'package:amadeus_app/core/widgets/custom_background/widgets/glitch_painter.dart';
 import 'package:amadeus_app/features/avatar/presentation/avatar_bloc/avatar_bloc.dart';
-import 'package:amadeus_app/features/avatar/presentation/conversation_bloc/conversation_bloc.dart';
-import 'package:amadeus_app/features/avatar/presentation/screens/avatar_screen.dart';
+import 'package:amadeus_app/features/home/presentation/conversation_bloc/conversation_bloc.dart';
+import 'package:amadeus_app/features/avatar/presentation/widgets/avatar_view.dart';
 import 'package:amadeus_app/features/home/presentation/widgets/home_speech_bubble.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -134,7 +134,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               bottom: false,
               child: Column(
                 children: [
-                  const Expanded(child: AvatarScreen()),
+                  const Expanded(child: AvatarView()),
                   BlocBuilder<ConversationBloc, ConversationState>(
                     builder: (context, state) {
                       return HomeSpeechBubble(isInteractionMode: state.mode);

@@ -47,7 +47,9 @@ Future<void> initServiceLocator() async {
 
   sl.registerLazySingleton(() => Dio());
 
-  sl.registerLazySingleton<GroqDatasource>(() => GroqDatasourceImpl(dio: sl()));
+  sl.registerLazySingleton<GroqDatasource>(
+    () => GroqDatasourceImpl(dio: sl(), cacheHelper: sl()),
+  );
 
   sl.registerLazySingleton<AiRepository>(
     () => AiRepositoryImpl(groqDatasource: sl()),

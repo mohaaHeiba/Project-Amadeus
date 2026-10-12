@@ -1,6 +1,6 @@
 import 'package:amadeus_app/core/constants/interaction_mode.dart';
 import 'package:amadeus_app/core/theme/app_colors.dart';
-import 'package:amadeus_app/features/avatar/presentation/conversation_bloc/conversation_bloc.dart';
+import 'package:amadeus_app/features/home/presentation/conversation_bloc/conversation_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

@@ -1,5 +1,5 @@
 import 'package:amadeus_app/core/constants/avatar_emotion.dart';
-import 'package:amadeus_app/features/avatar/data/model/rive_input_names.dart';
+import 'package:amadeus_app/features/avatar/data/models/rive_input_names.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

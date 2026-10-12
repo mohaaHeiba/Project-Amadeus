@@ -1,8 +1,8 @@
 import 'package:amadeus_app/core/constants/interaction_mode.dart';
 import 'package:amadeus_app/core/services/continuous_stt_service.dart';
 import 'package:amadeus_app/core/theme/app_colors.dart';
-import 'package:amadeus_app/features/ai/data/model/chat_message.dart';
-import 'package:amadeus_app/features/avatar/presentation/conversation_bloc/conversation_bloc.dart';
+import 'package:amadeus_app/features/ai/data/models/chat_message.dart';
+import 'package:amadeus_app/features/home/presentation/conversation_bloc/conversation_bloc.dart';
 import 'package:amadeus_app/features/home/presentation/widgets/home_mic_button.dart'; // مسار الكلاس الجديد
 import 'package:amadeus_app/features/home/presentation/widgets/home_text_input_area.dart';
 import 'package:flutter/material.dart';

@@ -1,4 +1,4 @@
-import 'package:amadeus_app/core/Extensions/spacing.dart';
+import 'package:amadeus_app/core/extensions/spacing.dart';
 import 'package:amadeus_app/core/routes/app_routes.dart';
 import 'package:amadeus_app/core/theme/app_colors.dart';
 import 'package:amadeus_app/core/utils/custom_snackbar.dart';

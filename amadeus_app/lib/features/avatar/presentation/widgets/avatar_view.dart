@@ -5,14 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rive/rive.dart';
 
-class AvatarScreen extends StatefulWidget {
-  const AvatarScreen({super.key});
+class AvatarView extends StatefulWidget {
+  const AvatarView({super.key});
 
   @override
-  State<AvatarScreen> createState() => _AvatarScreenState();
+  State<AvatarView> createState() => _AvatarViewState();
 }
 
-class _AvatarScreenState extends State<AvatarScreen> {
+class _AvatarViewState extends State<AvatarView> {
   late final fileLoader = FileLoader.fromAsset(
     Assets.riveAvatarAmadeus,
     riveFactory: Factory.flutter,

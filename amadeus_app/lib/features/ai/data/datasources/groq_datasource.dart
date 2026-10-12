@@ -1,6 +1,7 @@
 import 'package:amadeus_app/core/constants/avatar_emotion.dart';
-import 'package:amadeus_app/features/ai/data/model/chat_message.dart';
-import 'package:amadeus_app/features/ai/data/model/groq_response_model.dart';
+import 'package:amadeus_app/core/services/cache_helper.dart';
+import 'package:amadeus_app/features/ai/data/models/chat_message.dart';
+import 'package:amadeus_app/features/ai/data/models/groq_response_model.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -10,9 +11,10 @@ abstract class GroqDatasource {
 
 class GroqDatasourceImpl extends GroqDatasource {
   final Dio dio;
+  final CacheHelper cacheHelper;
 
-  GroqDatasourceImpl({required this.dio});
-
+  GroqDatasourceImpl({required this.dio, required this.cacheHelper});
+  String get nameUser => cacheHelper.getOperatorName;
   String get avatarList => AvatarEmotion.promptList;
 
   String get systemPromptContent =>
@@ -26,6 +28,7 @@ Personality & Speech Style:
 - You sometimes accidentally use internet slang (from @channel), but if called out, you will desperately deny being an internet nerd.
 - Your speech is articulate and intelligent. You often explain things scientifically, but you can be quick to sigh or snap when dealing with illogical behavior.
 
+and the user name = $nameUser
 You must always respond in this EXACT JSON format:
 {
   "text": "your reply here in character",

@@ -1,4 +1,4 @@
-import 'package:amadeus_app/features/ai/data/model/message_model.dart';
+import 'package:amadeus_app/features/ai/data/models/message_model.dart';
 
 /// Represents a single item in the "choices" array.
 ///

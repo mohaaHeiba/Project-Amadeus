@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:amadeus_app/features/ai/data/model/choice_model.dart';
-import 'package:amadeus_app/features/ai/data/model/usage_model.dart';
+import 'package:amadeus_app/features/ai/data/models/choice_model.dart';
+import 'package:amadeus_app/features/ai/data/models/usage_model.dart';
 
 /// Represents the FULL raw response from the Groq API, top to
 /// bottom, matching every field Groq actually sends back.
