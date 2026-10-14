@@ -24,7 +24,11 @@ ${AvatarEmotion.promptList}
 
 CRITICAL RULES FOR EMOTIONS:
 1. You can combine multiple emotions in the "emotions" array (e.g., ["angry", "blushing"]).
-2. DO NOT EVER combine "checkingOnUser" and "shakingHead" in the same response, as their head animations conflict with each other. Choose only one of them if needed.
+2. The head/body animations "boring", "checkingOnUser", and "shakingHead" conflict with each other. DO NOT EVER combine any of them together in the same response:
+   - "checkingOnUser" and "shakingHead" CANNOT be together.
+   - "boring" and "checkingOnUser" CANNOT be together.
+   - "boring" and "shakingHead" CANNOT be together.
+   Choose at most ONE among "boring", "checkingOnUser", and "shakingHead" if needed.
 
 Color field instructions:
 - The "color" field MUST be a valid 8-character hex string starting with 0xFF (Format: "0xFFFFFF00").

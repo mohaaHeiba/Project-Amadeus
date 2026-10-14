@@ -14,6 +14,7 @@ class AvatarBloc extends Bloc<AvatarEvent, AvatarState> {
     on<ToggleBlushingEvent>(_onToggleBlushing);
     on<ToggleShakingHeadEvent>(_onToggleShakingHead);
     on<ToggleCheckingOnUserEvent>(_onToggleCheckingOnUser);
+    on<ToggleBoringEvent>(_onToggleBoring);
     on<UpdateMouthValueEvent>(_onUpdateMouthValue);
     on<UpdateEmotionEvent>(_onUpdateEmotion, transformer: restartable());
   }
@@ -47,6 +48,10 @@ class AvatarBloc extends Bloc<AvatarEvent, AvatarState> {
     emit(state.copyWith(isCheckingOnUser: event.value));
   }
 
+  void _onToggleBoring(ToggleBoringEvent event, Emitter<AvatarState> emit) {
+    emit(state.copyWith(isBoring: event.value));
+  }
+
   void _onUpdateMouthValue(
     UpdateMouthValueEvent event,
     Emitter<AvatarState> emit,
@@ -62,7 +67,7 @@ class AvatarBloc extends Bloc<AvatarEvent, AvatarState> {
       AvatarState.fromEmotions(event.emotions, mouthValue: state.mouthValue),
     );
 
-    await Future.delayed(const Duration(seconds: 3));
+    await Future.delayed(const Duration(seconds: 7));
 
     emit(
       AvatarState.fromEmotions([

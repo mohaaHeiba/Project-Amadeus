@@ -33,6 +33,12 @@ final class ToggleCheckingOnUserEvent extends AvatarEvent {
   ToggleCheckingOnUserEvent(this.value);
 }
 
+/// Toggle the "boring" (bored/yawning) animation on/off.
+final class ToggleBoringEvent extends AvatarEvent {
+  final bool value;
+  ToggleBoringEvent(this.value);
+}
+
 final class UpdateEmotionEvent extends AvatarEvent {
   final List<AvatarEmotion> emotions;
 

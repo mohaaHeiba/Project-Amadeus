@@ -7,6 +7,7 @@ class AvatarState {
   final bool isBlushing;
   final bool isShakingHead;
   final bool isCheckingOnUser;
+  final bool isBoring;
   final double mouthValue;
 
   const AvatarState({
@@ -15,6 +16,7 @@ class AvatarState {
     this.isBlushing = false,
     this.isShakingHead = false,
     this.isCheckingOnUser = false,
+    this.isBoring = false,
     this.mouthValue = 0.0,
   });
 
@@ -24,6 +26,7 @@ class AvatarState {
     bool? isBlushing,
     bool? isShakingHead,
     bool? isCheckingOnUser,
+    bool? isBoring,
     double? mouthValue,
   }) {
     return AvatarState(
@@ -32,6 +35,7 @@ class AvatarState {
       isBlushing: isBlushing ?? this.isBlushing,
       isShakingHead: isShakingHead ?? this.isShakingHead,
       isCheckingOnUser: isCheckingOnUser ?? this.isCheckingOnUser,
+      isBoring: isBoring ?? this.isBoring,
       mouthValue: mouthValue ?? this.mouthValue,
     );
   }
@@ -46,6 +50,7 @@ class AvatarState {
       isBlushing: emotions.contains(AvatarEmotion.blushing),
       isShakingHead: emotions.contains(AvatarEmotion.shakingHead),
       isCheckingOnUser: emotions.contains(AvatarEmotion.checkingOnUser),
+      isBoring: emotions.contains(AvatarEmotion.boring),
       mouthValue: mouthValue,
     );
   }
@@ -57,6 +62,7 @@ class AvatarState {
       RiveInputNames.isBlushing: isBlushing,
       RiveInputNames.shakingHead: isShakingHead,
       RiveInputNames.checkingOnUser: isCheckingOnUser,
+      RiveInputNames.boring: isBoring,
       RiveInputNames.mouthValue: mouthValue,
     };
   }
@@ -68,6 +74,7 @@ class AvatarState {
       isBlushing: map[RiveInputNames.isBlushing] as bool? ?? false,
       isShakingHead: map[RiveInputNames.shakingHead] as bool? ?? false,
       isCheckingOnUser: map[RiveInputNames.checkingOnUser] as bool? ?? false,
+      isBoring: map[RiveInputNames.boring] as bool? ?? false,
       mouthValue: (map[RiveInputNames.mouthValue] as num?)?.toDouble() ?? 0.0,
     );
   }

@@ -30,3 +30,7 @@ final class ConversationFailedEvent extends ConversationEvent {
   final String message;
   ConversationFailedEvent(this.message);
 }
+
+final class ResetIdleTimerEvent extends ConversationEvent {}
+
+final class IdleTimeoutEvent extends ConversationEvent {}

@@ -19,6 +19,10 @@ enum AvatarEmotion {
   checkingOnUser(
     riveInput: 'are_u_okay',
     description: 'asking a question, curious, or worried about the user',
+  ),
+  boring(
+    riveInput: 'boring',
+    description: 'bored, waiting too long, or uninterested',
   );
 
   final String? riveInput;
@@ -43,7 +47,15 @@ enum AvatarEmotion {
         .toSet()
         .toList();
 
-    if (emotions.contains(checkingOnUser) && emotions.contains(shakingHead)) {
+    // Critical Rules:
+    // 1. checkingOnUser and shakingHead CANNOT be together.
+    // 2. boring CANNOT be together with checkingOnUser.
+    // 3. boring CANNOT be together with shakingHead.
+    if (emotions.contains(boring)) {
+      emotions.remove(checkingOnUser);
+      emotions.remove(shakingHead);
+    } else if (emotions.contains(checkingOnUser) &&
+        emotions.contains(shakingHead)) {
       emotions.remove(checkingOnUser);
     }
 

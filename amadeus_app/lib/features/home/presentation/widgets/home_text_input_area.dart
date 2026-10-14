@@ -86,6 +86,9 @@ class HomeTextInputAreaState extends State<HomeTextInputArea> {
                 ),
               ),
             ),
+            onChanged: (_) {
+              context.read<ConversationBloc>().add(ResetIdleTimerEvent());
+            },
             onSubmitted: (_) => _sendMessage(),
           ),
         ),

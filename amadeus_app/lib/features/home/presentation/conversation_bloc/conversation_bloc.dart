@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:math';
+
 import 'package:amadeus_app/core/constants/avatar_emotion.dart';
 import 'package:amadeus_app/core/constants/interaction_mode.dart';
 import 'package:amadeus_app/core/services/cache_helper.dart';
@@ -21,6 +24,9 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
   final List<ChatMessage> _chatHistory = [];
   static const int _maxHistory = 20;
 
+  Timer? _idleTimer;
+  static const Duration _idleTimeoutDuration = Duration(seconds: 15);
+
   ConversationBloc({
     required this.sendMessageUsecase,
     required this.cacheHelper,
@@ -37,10 +43,38 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
     on<SpeakingFinishedEvent>(_onSpeakingFinished);
     on<ConversationFailedEvent>(_onConversationFailed);
     on<ChangeInteractionModeEvent>(_onChangeMode);
+
+    on<ResetIdleTimerEvent>(_onResetIdleTimer);
+    on<IdleTimeoutEvent>(_onIdleTimeout);
+  }
+
+  void _resetIdleTimer() {
+    _cancelIdleTimer();
+    _idleTimer = Timer(_idleTimeoutDuration, () {
+      if (!isClosed) {
+        add(IdleTimeoutEvent());
+      }
+    });
+  }
+
+  void _cancelIdleTimer() {
+    _idleTimer?.cancel();
+    _idleTimer = null;
+  }
+
+  void _onResetIdleTimer(
+    ResetIdleTimerEvent event,
+    Emitter<ConversationState> emit,
+  ) {
+    if (state is! ConversationThinking && state is! ConversationSpeaking) {
+      _resetIdleTimer();
+    }
   }
 
   void _onAppReady(AppReadyEvent event, Emitter<ConversationState> emit) {
     emit(ConversationIdle(mode: state.mode));
+    _resetIdleTimer();
+
     // Auto-start listening when app is ready in voice mode
     if (state.mode == InteractionMode.voice) {
       add(StartListeningEvent());
@@ -74,6 +108,11 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
       emit(
         ConversationListening(mode: state.mode, partialText: event.partialText),
       );
+
+      // Cancel the idle timer when user is actively speaking
+      if (event.partialText.trim().isNotEmpty) {
+        _cancelIdleTimer();
+      }
     }
   }
 
@@ -86,6 +125,7 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
     }
     if (state is ConversationListening) {
       emit(ConversationIdle(mode: state.mode));
+      _resetIdleTimer();
     }
   }
 
@@ -93,6 +133,8 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
     SendUserMessageEvent event,
     Emitter<ConversationState> emit,
   ) async {
+    _cancelIdleTimer();
+
     if (speechRecognizer.isListening) {
       speechRecognizer.stop();
     }
@@ -127,6 +169,11 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
           mode: state.mode,
         ),
       );
+
+      await Future.delayed(const Duration(seconds: 4));
+      if (!isClosed) {
+        add(SpeakingFinishedEvent());
+      }
     } catch (e) {
       debugPrint('Error sending message: $e');
       emit(
@@ -135,6 +182,7 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
           mode: state.mode,
         ),
       );
+      _resetIdleTimer();
       // Auto-restart listening after API error in voice mode
       if (state.mode == InteractionMode.voice) {
         add(StartListeningEvent());
@@ -146,10 +194,13 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
     SpeakingFinishedEvent event,
     Emitter<ConversationState> emit,
   ) {
-    emit(ConversationIdle(mode: state.mode));
-    // Auto-restart listening after AI finishes speaking in voice mode
-    if (state.mode == InteractionMode.voice) {
-      add(StartListeningEvent());
+    if (state is ConversationSpeaking) {
+      emit(ConversationIdle(mode: state.mode));
+      _resetIdleTimer();
+      // Auto-restart listening after AI finishes speaking in voice mode
+      if (state.mode == InteractionMode.voice) {
+        add(StartListeningEvent());
+      }
     }
   }
 
@@ -158,6 +209,7 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
     Emitter<ConversationState> emit,
   ) {
     emit(ConversationError(event.message, mode: state.mode));
+    _resetIdleTimer();
     // Auto-restart listening after error in voice mode
     if (state.mode == InteractionMode.voice) {
       add(StartListeningEvent());
@@ -175,10 +227,57 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
     }
 
     emit(ConversationIdle(mode: event.newMode));
+    _resetIdleTimer();
 
     // Auto-start listening when switching to voice mode
     if (event.newMode == InteractionMode.voice) {
       add(StartListeningEvent());
     }
+  }
+
+  Future<void> _onIdleTimeout(
+    IdleTimeoutEvent event,
+    Emitter<ConversationState> emit,
+  ) async {
+    _cancelIdleTimer();
+
+    if (state is ConversationThinking || state is ConversationSpeaking) {
+      return;
+    }
+
+    final random = Random();
+    final isBoring = random.nextBool();
+    final selectedEmotion = isBoring
+        ? AvatarEmotion.boring
+        : AvatarEmotion.checkingOnUser;
+
+    final text = isBoring
+        ? "Sigh... this is taking forever. Are we doing anything?"
+        : "Operator, are you still there?";
+
+    final color = isBoring ? "0xFF90A4AE" : "0xFF00E5FF";
+
+    if (speechRecognizer.isListening) {
+      speechRecognizer.stop();
+    }
+
+    avatarBloc.add(UpdateEmotionEvent([selectedEmotion]));
+
+    emit(
+      ConversationSpeaking(text, [selectedEmotion], color, mode: state.mode),
+    );
+
+    // Restart STT listening after she finishes saying the pre-defined text
+    await Future.delayed(const Duration(seconds: 4));
+
+    if (!isClosed) {
+      add(SpeakingFinishedEvent());
+    }
+  }
+
+  @override
+  Future<void> close() {
+    _cancelIdleTimer();
+    return super.close();
   }
 }
