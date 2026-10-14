@@ -8,6 +8,8 @@ import 'package:amadeus_app/features/auth/data/repositories/auth_repository_impl
 import 'package:amadeus_app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:amadeus_app/features/auth/domain/usecases/save_operator_name_usecase.dart';
 import 'package:amadeus_app/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:amadeus_app/features/speech/data/speech_recognizer_impl.dart';
+import 'package:amadeus_app/features/speech/domain/speech_recognizer.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -18,6 +20,7 @@ Future<void> initServiceLocator() async {
   // 1. External (SharedPreferences)
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton(() => sharedPreferences);
+
   //--------------------------------------------------------
   //----------------------AUTH------------------------------
   //--------------------------------------------------------
@@ -42,10 +45,18 @@ Future<void> initServiceLocator() async {
   sl.registerFactory(() => AuthBloc(saveOperatorNameUseCase: sl()));
 
   //--------------------------------------------------------
-  //----------------------AI------------------------------
+  //----------------------AI--------------------------------
   //--------------------------------------------------------
 
-  sl.registerLazySingleton(() => Dio());
+  sl.registerLazySingleton(
+    () => Dio(
+      BaseOptions(
+        connectTimeout: const Duration(seconds: 15),
+        receiveTimeout: const Duration(seconds: 15),
+        sendTimeout: const Duration(seconds: 15),
+      ),
+    ),
+  );
 
   sl.registerLazySingleton<GroqDatasource>(() => GroqDatasourceImpl(dio: sl()));
 
@@ -54,4 +65,9 @@ Future<void> initServiceLocator() async {
   );
 
   sl.registerLazySingleton(() => SendMessageUsecase(aiRepository: sl()));
+
+  //--------------------------------------------------------
+  //----------------------SPEECH----------------------------
+  //--------------------------------------------------------
+  sl.registerLazySingleton<SpeechRecognizer>(() => SpeechRecognizerImpl());
 }

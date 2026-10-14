@@ -1,34 +1,24 @@
-import 'package:amadeus_app/core/constants/interaction_mode.dart';
 import 'package:amadeus_app/core/theme/app_colors.dart';
 import 'package:amadeus_app/features/home/presentation/conversation_bloc/conversation_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HomeMicButton extends StatelessWidget {
-  final InteractionMode isInteractionMode;
-
-  const HomeMicButton({super.key, required this.isInteractionMode});
-
-  void _toggleMode(BuildContext context) {
-    final newMode = isInteractionMode == InteractionMode.voice
-        ? InteractionMode.text
-        : InteractionMode.voice;
-
-    context.read<ConversationBloc>().add(ChangeInteractionModeEvent(newMode));
-  }
+  const HomeMicButton({super.key});
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ConversationBloc, ConversationState>(
-      builder: (context, conversationState) {
-        final isListening = conversationState is ConversationListening;
+      builder: (context, state) {
+        final isListening = state is ConversationListening;
 
         return GestureDetector(
           onTap: () {
-            context.read<ConversationBloc>().add(
-              ToggleListeningEvent(!isListening),
-            );
-            _toggleMode(context);
+            if (isListening) {
+              context.read<ConversationBloc>().add(StopListeningEvent());
+            } else {
+              context.read<ConversationBloc>().add(StartListeningEvent());
+            }
           },
           child: Container(
             height: 60,
@@ -56,9 +46,7 @@ class HomeMicButton extends StatelessWidget {
             ),
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
             child: Icon(
-              isInteractionMode == InteractionMode.voice
-                  ? Icons.mic
-                  : Icons.mic_off,
+              isListening ? Icons.mic : Icons.mic_none,
               color: AppColors.primary,
               size: 28,
             ),

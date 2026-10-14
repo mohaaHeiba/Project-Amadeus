@@ -1,15 +1,15 @@
 import 'package:amadeus_app/core/constants/interaction_mode.dart';
-import 'package:amadeus_app/core/services/continuous_stt_service.dart';
 import 'package:amadeus_app/core/theme/app_colors.dart';
 import 'package:amadeus_app/features/home/presentation/conversation_bloc/conversation_bloc.dart';
-import 'package:amadeus_app/features/home/presentation/widgets/home_mic_button.dart'; // مسار الكلاس الجديد
+import 'package:amadeus_app/features/home/presentation/widgets/home_mic_button.dart';
 import 'package:amadeus_app/features/home/presentation/widgets/home_text_input_area.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HomeSpeechBubble extends StatefulWidget {
-  final InteractionMode isInteractionMode;
-  const HomeSpeechBubble({super.key, required this.isInteractionMode});
+  final InteractionMode interactionMode;
+
+  const HomeSpeechBubble({super.key, required this.interactionMode});
 
   @override
   State<HomeSpeechBubble> createState() => _HomeSpeechBubbleState();
@@ -18,59 +18,19 @@ class HomeSpeechBubble extends StatefulWidget {
 class _HomeSpeechBubbleState extends State<HomeSpeechBubble> {
   String _lastDisplayedText =
       "Good evening. Have the worldline divergence parameters shifted again?";
-  String stateText = "■ AMADEUS // KURISU";
-  final ContinuousSttService _sttService = ContinuousSttService();
-
-  @override
-  void didUpdateWidget(covariant HomeSpeechBubble oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.isInteractionMode != widget.isInteractionMode) {
-      _handleSttState(widget.isInteractionMode);
-    }
-  }
-
-  void _handleSttState(InteractionMode mode) {
-    if (mode == InteractionMode.voice) {
-      _sttService.start(
-        onResult: (text) {
-          setState(() {
-            _lastDisplayedText = text;
-          });
-        },
-        onFinalResult: (finalWord) {
-          context.read<ConversationBloc>().add(SendUserMessageEvent(finalWord));
-        },
-      );
-    } else {
-      _sttService.stop();
-    }
-  }
-
-  @override
-  void dispose() {
-    _sttService.stop();
-    super.dispose();
-  }
+  final String stateText = "■ AMADEUS // KURISU";
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<ConversationBloc, ConversationState>(
-      listener: (context, state) {
-        if (state is ConversationSpeaking) {
-          _sttService.stop();
-        }
-        if (state is ConversationListening &&
-            widget.isInteractionMode == InteractionMode.voice) {
-          _handleSttState(InteractionMode.voice);
-        }
-      },
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.only(left: 16, right: 16, bottom: 26),
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Container(
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 26),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            ConstrainedBox(
+              constraints: BoxConstraints(minHeight: 210, maxHeight: 300),
+              child: Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: const Color(0xFF1E1E1E).withValues(alpha: 0.95),
@@ -103,70 +63,86 @@ class _HomeSpeechBubbleState extends State<HomeSpeechBubble> {
                     ),
                     const SizedBox(height: 12),
 
-                    BlocBuilder<ConversationBloc, ConversationState>(
-                      builder: (context, state) {
-                        String displayText = _lastDisplayedText;
-                        Color textColor = Colors.white;
-
-                        if (state is ConversationListening) {
-                          displayText = "[Listening to user input...]";
-                          textColor = Colors.orangeAccent;
-                        } else if (state is ConversationThinking) {
-                          displayText =
-                              "[Connecting to Amadeus Server... Processing...]";
-                          textColor = Colors.grey;
-                        } else if (state is ConversationSpeaking) {
-                          displayText = state.replyText;
-                          WidgetsBinding.instance.addPostFrameCallback((_) {
-                            if (mounted &&
-                                _lastDisplayedText != state.replyText) {
-                              setState(
-                                () => _lastDisplayedText = state.replyText,
-                              );
+                    Flexible(
+                      child: SingleChildScrollView(
+                        child: BlocListener<ConversationBloc, ConversationState>(
+                          listener: (context, state) {
+                            if (state is ConversationSpeaking) {
+                              setState(() {
+                                _lastDisplayedText = state.replyText;
+                              });
                             }
-                          });
-                        } else if (state is ConversationError) {
-                          displayText = "ERR: ${state.message}";
-                          textColor = Colors.redAccent;
-                        }
+                          },
+                          child: BlocBuilder<ConversationBloc, ConversationState>(
+                            buildWhen: (previous, current) {
+                              if (previous.runtimeType != current.runtimeType)
+                                return true;
+                              if (previous is ConversationListening &&
+                                  current is ConversationListening) {
+                                return previous.partialText !=
+                                    current.partialText;
+                              }
+                              return false;
+                            },
+                            builder: (context, state) {
+                              String displayText = _lastDisplayedText;
+                              Color textColor = Colors.white;
 
-                        return AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 300),
-                          child: Text(
-                            displayText,
-                            key: ValueKey<String>(displayText),
-                            style: TextStyle(
-                              color: textColor,
-                              fontSize: 16,
-                              fontFamily: 'Courier',
-                              height: 1.5,
-                            ),
+                              if (state is ConversationListening) {
+                                displayText = state.partialText.isEmpty
+                                    ? "[Listening to user input...]"
+                                    : state.partialText;
+                                textColor = Colors.orangeAccent;
+                              } else if (state is ConversationThinking) {
+                                displayText =
+                                    "[Connecting to Amadeus Server... Processing...]";
+                                textColor = Colors.grey;
+                              } else if (state is ConversationSpeaking) {
+                                displayText = state.replyText;
+                              } else if (state is ConversationError) {
+                                displayText = "ERR: ${state.message}";
+                                textColor = Colors.redAccent;
+                              }
+
+                              return AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 300),
+                                child: Text(
+                                  displayText,
+                                  key: ValueKey<String>(displayText),
+                                  style: TextStyle(
+                                    color: textColor,
+                                    fontSize: 16,
+                                    fontFamily: 'Courier',
+                                    height: 1.5,
+                                  ),
+                                ),
+                              );
+                            },
                           ),
-                        );
-                      },
+                        ),
+                      ),
                     ),
 
-                    if (widget.isInteractionMode == InteractionMode.text) ...[
+                    if (widget.interactionMode == InteractionMode.text) ...[
                       const SizedBox(height: 16),
                       const HomeTextInputArea(),
                     ],
                   ],
                 ),
               ),
+            ),
 
-              Positioned(
+            if (widget.interactionMode == InteractionMode.voice)
+              const Positioned(
                 top: -45,
                 left: 0,
                 right: 0,
                 child: Align(
                   alignment: Alignment.center,
-                  child: HomeMicButton(
-                    isInteractionMode: widget.isInteractionMode,
-                  ),
+                  child: HomeMicButton(),
                 ),
               ),
-            ],
-          ),
+          ],
         ),
       ),
     );

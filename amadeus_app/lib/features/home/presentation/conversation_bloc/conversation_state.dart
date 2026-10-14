@@ -7,27 +7,23 @@ sealed class ConversationState {
   const ConversationState({required this.mode});
 }
 
-/// App just started, nothing has happened yet (e.g. splash/loading).
 final class ConversationInitial extends ConversationState {
   const ConversationInitial({required super.mode});
 }
 
-/// Resting state: not listening, not thinking, not speaking.
 final class ConversationIdle extends ConversationState {
   const ConversationIdle({required super.mode});
 }
 
-/// Microphone is active, capturing the user's voice.
 final class ConversationListening extends ConversationState {
-  const ConversationListening({required super.mode});
+  final String partialText;
+  const ConversationListening({this.partialText = "", required super.mode});
 }
 
-/// Waiting on a response from the AI backend.
 final class ConversationThinking extends ConversationState {
   const ConversationThinking({required super.mode});
 }
 
-/// The avatar is speaking the AI's response, with the emotion to play.
 final class ConversationSpeaking extends ConversationState {
   final String replyText;
   final AvatarEmotion emotion;
@@ -41,7 +37,6 @@ final class ConversationSpeaking extends ConversationState {
   });
 }
 
-/// Something failed (e.g. the AI API call failed).
 final class ConversationError extends ConversationState {
   final String message;
   const ConversationError(this.message, {required super.mode});

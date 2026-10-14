@@ -14,13 +14,8 @@ class AppRoutes {
   static const String auth = '/auth';
   static const String home = '/home';
 
-  // static const String details = '/onbording';
-
   static final GoRouter router = GoRouter(
     initialLocation: sl<CacheHelper>().isLoggedIn ? home : splash,
-
-    // errorBuilder: (context, state) =>
-    // const Scaffold(body: Center(child: Text('Page not found!'))),
     routes: [
       GoRoute(path: splash, builder: (context, state) => const SplashScreen()),
       GoRoute(
@@ -30,25 +25,24 @@ class AppRoutes {
           child: const AuthScreen(),
         ),
       ),
-
       GoRoute(
         path: home,
         builder: (context, state) => MultiBlocProvider(
           providers: [
             BlocProvider(create: (context) => AvatarBloc()),
+
             BlocProvider(
-              create: (context) =>
-                  ConversationBloc(sendMessageUsecase: sl(), cacheHelper: sl()),
+              create: (context) => ConversationBloc(
+                sendMessageUsecase: sl(),
+                cacheHelper: sl(),
+                speechRecognizer: sl(),
+                avatarBloc: context.read<AvatarBloc>(),
+              ),
             ),
           ],
-          child: HomeScreen(),
+          child: const HomeScreen(),
         ),
       ),
-
-      // GoRoute(
-      //   path: details,
-      //   // builder: (context, state) => const DetailsPage(),
-      // ),
     ],
   );
 }

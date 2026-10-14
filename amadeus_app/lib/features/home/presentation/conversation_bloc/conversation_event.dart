@@ -3,13 +3,15 @@ part of 'conversation_bloc.dart';
 @immutable
 sealed class ConversationEvent {}
 
-/// The app finished loading/setup, ready to go idle.
 final class AppReadyEvent extends ConversationEvent {}
 
-/// The user started or stopped using the microphone.
-final class ToggleListeningEvent extends ConversationEvent {
-  final bool isListening;
-  ToggleListeningEvent(this.isListening);
+final class StartListeningEvent extends ConversationEvent {}
+
+final class StopListeningEvent extends ConversationEvent {}
+
+final class UpdateListeningTextEvent extends ConversationEvent {
+  final String partialText;
+  UpdateListeningTextEvent(this.partialText);
 }
 
 final class SendUserMessageEvent extends ConversationEvent {
@@ -22,10 +24,8 @@ final class ChangeInteractionModeEvent extends ConversationEvent {
   ChangeInteractionModeEvent(this.newMode);
 }
 
-/// The avatar finished speaking the response, back to idle.
 final class SpeakingFinishedEvent extends ConversationEvent {}
 
-/// Something failed (e.g. the AI API call failed).
 final class ConversationFailedEvent extends ConversationEvent {
   final String message;
   ConversationFailedEvent(this.message);

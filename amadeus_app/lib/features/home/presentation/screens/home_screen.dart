@@ -2,9 +2,8 @@ import 'package:amadeus_app/core/theme/app_colors.dart';
 import 'package:amadeus_app/core/utils/custom_snackbar.dart';
 import 'package:amadeus_app/core/widgets/custom_background/custom_background.dart';
 import 'package:amadeus_app/core/widgets/custom_background/widgets/glitch_painter.dart';
-import 'package:amadeus_app/features/avatar/presentation/avatar_bloc/avatar_bloc.dart';
-import 'package:amadeus_app/features/home/presentation/conversation_bloc/conversation_bloc.dart';
 import 'package:amadeus_app/features/avatar/presentation/widgets/avatar_view.dart';
+import 'package:amadeus_app/features/home/presentation/conversation_bloc/conversation_bloc.dart';
 import 'package:amadeus_app/features/home/presentation/widgets/home_speech_bubble.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -86,14 +85,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
         if (state is ConversationSpeaking) {
           setState(() => condition = _parseHexColor(state.color));
-          context.read<AvatarBloc>().add(UpdateEmotionEvent(state.emotion));
         }
       },
       child: Scaffold(
         body: Stack(
           children: [
             customBackground(context),
-
             Positioned(
               top: size.height * 0.16,
               left: 0,
@@ -129,7 +126,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ),
               ),
             ),
-
             SafeArea(
               bottom: false,
               child: Column(
@@ -137,13 +133,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   const Expanded(child: AvatarView()),
                   BlocBuilder<ConversationBloc, ConversationState>(
                     builder: (context, state) {
-                      return HomeSpeechBubble(isInteractionMode: state.mode);
+                      return HomeSpeechBubble(interactionMode: state.mode);
                     },
                   ),
                 ],
               ),
             ),
-
             if (hasError)
               IgnorePointer(
                 child: AnimatedBuilder(
