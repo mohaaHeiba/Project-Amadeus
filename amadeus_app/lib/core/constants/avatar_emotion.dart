@@ -22,7 +22,6 @@ enum AvatarEmotion {
   );
 
   final String? riveInput;
-
   final String description;
 
   const AvatarEmotion({this.riveInput, required this.description});
@@ -33,6 +32,23 @@ enum AvatarEmotion {
       if (e.name.toLowerCase() == name) return e;
     }
     return neutral;
+  }
+
+  static List<AvatarEmotion> fromList(List<dynamic>? rawList) {
+    if (rawList == null || rawList.isEmpty) return [neutral];
+
+    final emotions = rawList
+        .map((e) => fromName(e.toString()))
+        .where((e) => e != neutral)
+        .toSet()
+        .toList();
+
+    if (emotions.contains(checkingOnUser) && emotions.contains(shakingHead)) {
+      emotions.remove(checkingOnUser);
+    }
+
+    if (emotions.isEmpty) return [neutral];
+    return emotions;
   }
 
   static String get promptList =>

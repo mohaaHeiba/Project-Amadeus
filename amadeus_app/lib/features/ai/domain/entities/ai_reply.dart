@@ -2,7 +2,7 @@ import 'package:amadeus_app/core/constants/avatar_emotion.dart';
 
 class AiReply {
   final String text;
-  final AvatarEmotion emotion;
+  final List<AvatarEmotion> emotions;
   final String color;
 
   final String raw;
@@ -10,7 +10,7 @@ class AiReply {
   const AiReply(
     this.color, {
     required this.text,
-    required this.emotion,
+    required this.emotions,
     required this.raw,
   });
 }

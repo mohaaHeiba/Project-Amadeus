@@ -15,13 +15,16 @@ You are talking with an operator named $operatorName. Address them by name occas
 You must always respond in this EXACT JSON format:
 {
   "text": "your reply here in character",
-  "emotion": "one of the allowed values below",
+  "emotions": ["emotion1", "emotion2"],
   "color": "0xFFRRGGBB"
 }
 
-Allowed emotion values (use EXACTLY one of these strings):
-  ${AvatarEmotion.promptList}
-Do NOT use any other emotion values. Choose the emotion that best matches the tone of your text.
+Allowed emotion values to choose from:
+${AvatarEmotion.promptList}
+
+CRITICAL RULES FOR EMOTIONS:
+1. You can combine multiple emotions in the "emotions" array (e.g., ["angry", "blushing"]).
+2. DO NOT EVER combine "checkingOnUser" and "shakingHead" in the same response, as their head animations conflict with each other. Choose only one of them if needed.
 
 Color field instructions:
 - The "color" field MUST be a valid 8-character hex string starting with 0xFF (Format: "0xFFFFFF00").

@@ -26,12 +26,12 @@ final class ConversationThinking extends ConversationState {
 
 final class ConversationSpeaking extends ConversationState {
   final String replyText;
-  final AvatarEmotion emotion;
+  final List<AvatarEmotion> emotions;
   final String color;
 
   const ConversationSpeaking(
     this.replyText,
-    this.emotion,
+    this.emotions,
     this.color, {
     required super.mode,
   });

@@ -34,9 +34,9 @@ final class ToggleCheckingOnUserEvent extends AvatarEvent {
 }
 
 final class UpdateEmotionEvent extends AvatarEvent {
-  final AvatarEmotion emotion;
+  final List<AvatarEmotion> emotions;
 
-  UpdateEmotionEvent(this.emotion);
+  UpdateEmotionEvent(this.emotions);
 }
 
 /// Update the mouth value (0-100) for lip-sync.

@@ -36,16 +36,16 @@ class AvatarState {
     );
   }
 
-  factory AvatarState.fromEmotion(
-    AvatarEmotion emotion, {
+  factory AvatarState.fromEmotions(
+    List<AvatarEmotion> emotions, {
     double mouthValue = 0.0,
   }) {
     return AvatarState(
-      isAngry: emotion == AvatarEmotion.angry,
-      isHandToChest: emotion == AvatarEmotion.handToChest,
-      isBlushing: emotion == AvatarEmotion.blushing,
-      isShakingHead: emotion == AvatarEmotion.shakingHead,
-      isCheckingOnUser: emotion == AvatarEmotion.checkingOnUser,
+      isAngry: emotions.contains(AvatarEmotion.angry),
+      isHandToChest: emotions.contains(AvatarEmotion.handToChest),
+      isBlushing: emotions.contains(AvatarEmotion.blushing),
+      isShakingHead: emotions.contains(AvatarEmotion.shakingHead),
+      isCheckingOnUser: emotions.contains(AvatarEmotion.checkingOnUser),
       mouthValue: mouthValue,
     );
   }

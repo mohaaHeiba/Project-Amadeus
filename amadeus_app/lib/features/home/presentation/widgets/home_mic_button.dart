@@ -1,3 +1,4 @@
+import 'package:amadeus_app/core/constants/interaction_mode.dart';
 import 'package:amadeus_app/core/theme/app_colors.dart';
 import 'package:amadeus_app/features/home/presentation/conversation_bloc/conversation_bloc.dart';
 import 'package:flutter/material.dart';
@@ -14,11 +15,10 @@ class HomeMicButton extends StatelessWidget {
 
         return GestureDetector(
           onTap: () {
-            if (isListening) {
-              context.read<ConversationBloc>().add(StopListeningEvent());
-            } else {
-              context.read<ConversationBloc>().add(StartListeningEvent());
-            }
+            // Pressing mic button switches to text/chat mode
+            context
+                .read<ConversationBloc>()
+                .add(ChangeInteractionModeEvent(InteractionMode.text));
           },
           child: Container(
             height: 60,

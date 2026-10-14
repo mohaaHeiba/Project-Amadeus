@@ -1,3 +1,4 @@
+import 'package:amadeus_app/core/constants/interaction_mode.dart';
 import 'package:amadeus_app/core/theme/app_colors.dart';
 import 'package:amadeus_app/features/home/presentation/conversation_bloc/conversation_bloc.dart';
 import 'package:flutter/material.dart';
@@ -31,6 +32,26 @@ class HomeTextInputAreaState extends State<HomeTextInputArea> {
   Widget build(BuildContext context) {
     return Row(
       children: [
+        // Mic button to switch back to voice mode
+        GestureDetector(
+          onTap: () {
+            context
+                .read<ConversationBloc>()
+                .add(ChangeInteractionModeEvent(InteractionMode.voice));
+          },
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: AppColors.primary.withValues(alpha: 0.5),
+              ),
+            ),
+            child: const Icon(Icons.mic, color: AppColors.primary, size: 20),
+          ),
+        ),
+        const SizedBox(width: 8),
         Expanded(
           child: TextField(
             controller: _controller,
@@ -87,3 +108,4 @@ class HomeTextInputAreaState extends State<HomeTextInputArea> {
     );
   }
 }
+

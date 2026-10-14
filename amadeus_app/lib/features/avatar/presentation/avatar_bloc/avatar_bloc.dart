@@ -58,15 +58,16 @@ class AvatarBloc extends Bloc<AvatarEvent, AvatarState> {
     UpdateEmotionEvent event,
     Emitter<AvatarState> emit,
   ) async {
-    emit(AvatarState.fromEmotion(event.emotion, mouthValue: state.mouthValue));
+    emit(
+      AvatarState.fromEmotions(event.emotions, mouthValue: state.mouthValue),
+    );
 
     await Future.delayed(const Duration(seconds: 3));
 
     emit(
-      AvatarState.fromEmotion(
+      AvatarState.fromEmotions([
         AvatarEmotion.neutral,
-        mouthValue: state.mouthValue,
-      ),
+      ], mouthValue: state.mouthValue),
     );
   }
 }

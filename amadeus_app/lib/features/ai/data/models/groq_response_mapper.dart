@@ -10,7 +10,7 @@ extension GroqResponseMapper on GroqResponseModel {
       return AiReply(
         '0xFF000000',
         text: 'Error: No choices returned.',
-        emotion: AvatarEmotion.neutral,
+        emotions: [AvatarEmotion.neutral],
         raw: '',
       );
     }
@@ -21,14 +21,14 @@ extension GroqResponseMapper on GroqResponseModel {
       return AiReply(
         json['color'] as String? ?? '0xFF000000',
         text: json['text'] as String? ?? raw,
-        emotion: AvatarEmotion.fromName(json['emotion'] as String?),
+        emotions: AvatarEmotion.fromList(json['emotions'] as List<dynamic>?),
         raw: raw,
       );
     } catch (_) {
       return AiReply(
         '0xFF000000',
         text: raw,
-        emotion: AvatarEmotion.neutral,
+        emotions: [AvatarEmotion.neutral],
         raw: raw,
       );
     }

@@ -41,6 +41,10 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
 
   void _onAppReady(AppReadyEvent event, Emitter<ConversationState> emit) {
     emit(ConversationIdle(mode: state.mode));
+    // Auto-start listening when app is ready in voice mode
+    if (state.mode == InteractionMode.voice) {
+      add(StartListeningEvent());
+    }
   }
 
   void _onStartListening(
@@ -113,12 +117,12 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
         _chatHistory.removeRange(0, _chatHistory.length - _maxHistory);
       }
 
-      avatarBloc.add(UpdateEmotionEvent(reply.emotion));
+      avatarBloc.add(UpdateEmotionEvent(reply.emotions));
 
       emit(
         ConversationSpeaking(
           reply.text,
-          reply.emotion,
+          reply.emotions,
           reply.color,
           mode: state.mode,
         ),
@@ -131,6 +135,10 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
           mode: state.mode,
         ),
       );
+      // Auto-restart listening after API error in voice mode
+      if (state.mode == InteractionMode.voice) {
+        add(StartListeningEvent());
+      }
     }
   }
 
@@ -139,6 +147,10 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
     Emitter<ConversationState> emit,
   ) {
     emit(ConversationIdle(mode: state.mode));
+    // Auto-restart listening after AI finishes speaking in voice mode
+    if (state.mode == InteractionMode.voice) {
+      add(StartListeningEvent());
+    }
   }
 
   void _onConversationFailed(
@@ -146,6 +158,10 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
     Emitter<ConversationState> emit,
   ) {
     emit(ConversationError(event.message, mode: state.mode));
+    // Auto-restart listening after error in voice mode
+    if (state.mode == InteractionMode.voice) {
+      add(StartListeningEvent());
+    }
   }
 
   Future<void> _onChangeMode(
@@ -159,5 +175,10 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
     }
 
     emit(ConversationIdle(mode: event.newMode));
+
+    // Auto-start listening when switching to voice mode
+    if (event.newMode == InteractionMode.voice) {
+      add(StartListeningEvent());
+    }
   }
 }

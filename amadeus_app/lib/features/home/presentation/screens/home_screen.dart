@@ -39,6 +39,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       vsync: this,
       duration: const Duration(seconds: 3),
     )..repeat(reverse: true);
+
+    // Fire AppReadyEvent after the first frame to start auto-listening
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<ConversationBloc>().add(AppReadyEvent());
+      }
+    });
   }
 
   Color _parseHexColor(String? hexString) {
