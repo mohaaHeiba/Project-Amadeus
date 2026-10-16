@@ -36,6 +36,7 @@ class AppRoutes {
                 sendMessageUsecase: sl(),
                 cacheHelper: sl(),
                 speechRecognizer: sl(),
+                ttsService: sl(),
                 avatarBloc: context.read<AvatarBloc>(),
               ),
             ),

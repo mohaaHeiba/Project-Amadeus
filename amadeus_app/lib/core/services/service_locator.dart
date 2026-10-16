@@ -9,7 +9,9 @@ import 'package:amadeus_app/features/auth/domain/repositories/auth_repository.da
 import 'package:amadeus_app/features/auth/domain/usecases/save_operator_name_usecase.dart';
 import 'package:amadeus_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:amadeus_app/features/speech/data/speech_recognizer_impl.dart';
+import 'package:amadeus_app/features/speech/data/tts_service_impl.dart';
 import 'package:amadeus_app/features/speech/domain/speech_recognizer.dart';
+import 'package:amadeus_app/features/speech/domain/tts_service.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -67,7 +69,8 @@ Future<void> initServiceLocator() async {
   sl.registerLazySingleton(() => SendMessageUsecase(aiRepository: sl()));
 
   //--------------------------------------------------------
-  //----------------------SPEECH----------------------------
+  //----------------------SPEECH & TTS----------------------
   //--------------------------------------------------------
   sl.registerLazySingleton<SpeechRecognizer>(() => SpeechRecognizerImpl());
+  sl.registerLazySingleton<TtsService>(() => TtsServiceImpl());
 }
