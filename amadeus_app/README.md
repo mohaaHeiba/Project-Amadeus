@@ -1,6 +1,6 @@
 # Amadeus
 
-> An interactive 2D AI companion inspired by the "Amadeus" system from *Steins;Gate 0*. Features a Rive-animated avatar that converses via voice or text, with emotional states and animations driven autonomously by the AI.
+> An interactive 2D AI companion inspired by the "Amadeus" system from *Steins;Gate 0*. Features a Rive-animated avatar that converses via voice or text, with vocal synthesis, dynamic lip-sync, and animations driven autonomously by the AI.
 
 ![Flutter](https://img.shields.io/badge/Flutter-3.41.9-02569B?logo=flutter)
 ![Dart](https://img.shields.io/badge/Dart-3.11.5-0175C2?logo=dart)
@@ -23,19 +23,20 @@
 
 ## 📖 Overview
 
-Amadeus is a portfolio Flutter application that reconstructs the conversational AI assistant from the science-fiction visual novel *Steins;Gate 0*. Built with Clean Architecture and BLoC, the app features an animated Kurisu Makise 2D avatar controlled in real time by an LLM via the Groq API. 
+Amadeus is a portfolio Flutter application that reconstructs the conversational AI assistant from the science-fiction visual novel *Steins;Gate 0*. Built with Clean Architecture and BLoC, the app features an animated Kurisu Makise 2D avatar controlled in real time by an LLM via the Groq API.
 
-The system prompt strictly casts the AI into character—an articulate, slightly tsundere neuroscientist—and requires structured JSON output. Rather than relying on static pre-scripted triggers, the LLM itself selects appropriate facial expressions and body language based on the conversational tone, which the Flutter app maps directly into active Rive state machine inputs.
+The system prompt strictly casts the AI into character—an articulate, slightly tsundere neuroscientist—and requires structured JSON output. The LLM autonomously dictates reply text, ambient theme colors, emotional gestures, and speech rates. An on-device Text-to-Speech (TTS) engine synthesizes her responses with natural female voice filtering, actively driving real-time procedural lip-sync movements on the Rive artboard.
 
 ### Key Features
 
-- **Persona-Driven AI Conversation**: Connects to the Groq API (`openai/gpt-oss-20b`) using a custom system prompt that incorporates the operator's name and enforces personality boundaries.
-- **Autonomous Emotion Dispatch**: The model returns JSON containing both reply dialogue and emotion identifiers (`angry`, `blushing`, `handToChest`, `shakingHead`, `checkingOnUser`, `boring`).
-- **Real-Time 2D Rive Avatar**: Single unified state machine (`State Machine 2`) managing procedural breathing, eye blinks, hair movement, numeric mouth movement (`Mouth_Value`), and discrete emotional gestures.
-- **Dual Interaction Modes**: Seamless switching between hands-free voice recognition (`speech_to_text`) and tactile cyber-terminal keyboard input, persisted across sessions.
-- **Contextual Memory**: Retains the last 20 conversation turns in memory to maintain immediate conversational continuity.
-- **Proactive Idle Behavior**: Triggers unprompted avatar interventions if the user remains inactive for prolonged periods (e.g., checking on the user or displaying boredom).
-- **Terminal Aesthetics**: CRT grid painter, telemetry diagnostic bars, custom glitch shader effects, and reactive ambient illumination that shifts color based on avatar mood.
+- **Persona-Driven Conversational AI**: Connects to the Groq API (`openai/gpt-oss-20b`) with a system prompt enforcing Kurisu Makise's personality, speech patterns, and operator callsign awareness.
+- **Autonomous Emotion & Cadence Dispatch**: The model returns JSON containing reply dialogue, emotion tags (`angry`, `blushing`, `handToChest`, `shakingHead`, `checkingOnUser`, `boring`), ambient glow hex colors, and dynamic speech rates (`speech_rate`).
+- **Real-Time 2D Rive Avatar**: Unified state machine (`State Machine 2`) managing procedural breathing, eye blinks, hair sway, numeric mouth positions (`Mouth_Value`), and discrete emotional animations.
+- **Natural Voice Synthesis (TTS)**: Clean-architecture TTS service leveraging `flutter_tts` tuned to Kurisu's persona (pitch `1.15`). Automatically filters and prioritizes cloud WaveNet voices on Android and enhanced/Siri voices on iOS.
+- **Real-Time Lip-Sync Animation**: Synchronizes speech audio with avatar mouth movement by modulating `Mouth_Value` during speech playback and snapping to `0.0` (closed) on completion, cancellation, or interruption.
+- **Continuous Auto-Listening (STT)**: Hands-free voice recognition loop via `speech_to_text` that pauses while Amadeus is thinking or speaking, and automatically resumes listening when vocalization completes.
+- **Autonomous Idle Initiative**: Proactive 15-second idle timer that triggers character-accurate spoken nudges (e.g., checking on the operator or complaining of boredom) if the user goes silent.
+- **Terminal UI & Diagnostics**: Cyberpunk CRT grid painter, telemetry diagnostic bars, custom glitch shader effects, and reactive ambient illumination.
 
 ---
 
@@ -50,29 +51,38 @@ sequenceDiagram
     participant Usecase as SendMessageUsecase
     participant Repo as AiRepositoryImpl
     participant Groq as Groq API
+    participant TTS as TtsService
     participant Avatar as AvatarBloc
     participant Rive as Rive StateMachine
 
-    User->>UI: Speaks (STT) or types text message
+    User->>UI: Speaks (auto-listening STT) or types message
     UI->>ConvBloc: SendUserMessageEvent(text)
     ConvBloc->>ConvBloc: Emit ConversationThinking
     ConvBloc->>Usecase: call(history, operatorName)
     Usecase->>Repo: sendMessage(messages)
-    Repo->>Groq: POST /chat/completions (JSON schema prompt)
-    Groq-->>Repo: {"text": "...", "emotions": [...], "color": "..."}
-    Repo-->>ConvBloc: AiReply(text, emotions, color)
+    Repo->>Groq: POST /chat/completions (JSON schema mode)
+    Groq-->>Repo: {"text": "...", "emotions": [...], "color": "...", "speech_rate": 0.5}
+    Repo-->>ConvBloc: AiReply entity
     ConvBloc->>ConvBloc: Emit ConversationSpeaking
     ConvBloc->>Avatar: UpdateEmotionEvent(reply.emotions)
-    Avatar->>Rive: Set boolean inputs (angry, isBlushing, etc.)
-    UI->>UI: Render dialogue bubble & ambient glow color
+    Avatar->>Rive: Set boolean inputs (angry, blushing, etc.)
+    ConvBloc->>TTS: speak(reply.text, rate: reply.speechRate)
+    TTS-->>ConvBloc: onStart callback -> Start lip-sync modulation
+    ConvBloc->>Avatar: UpdateMouthValueEvent(25.0 - 85.0)
+    Avatar->>Rive: Number input: Mouth_Value
+    TTS-->>ConvBloc: onCompletion callback -> Stop lip-sync
+    ConvBloc->>Avatar: UpdateMouthValueEvent(0.0) [closed]
+    ConvBloc->>ConvBloc: SpeakingFinishedEvent -> Emit ConversationIdle
+    ConvBloc->>UI: Auto-restart STT listening (voice mode)
 ```
 
-1. User input is captured via `SpeechRecognizer` (voice) or `HomeTextInputArea` (text) and dispatched to `ConversationBloc`.
-2. `ConversationBloc` transitions state to `ConversationThinking` and calls `SendMessageUsecase` with the rolling 20-message memory.
-3. `AiRepositoryImpl` formats the chat history into Groq's OpenAI-compatible completions endpoint using `Dio`.
-4. The raw JSON payload is deserialized by `GroqResponseMapper` into an `AiReply` domain entity.
-5. `ConversationBloc` transitions to `ConversationSpeaking`, updates the UI dialogue bubble, and sends an `UpdateEmotionEvent` to `AvatarBloc`.
-6. `AvatarBloc` translates the emotion list into boolean flags and applies them to the Rive artboard via `toRiveInputsMap()`.
+1. User input is captured via `SpeechRecognizer` (continuous STT) or `HomeTextInputArea` (text) and dispatched to `ConversationBloc`.
+2. `ConversationBloc` transitions to `ConversationThinking` and calls `SendMessageUsecase` with the rolling 20-message memory.
+3. `AiRepositoryImpl` queries Groq's completions endpoint with a 15-second timeout, enforcing strict JSON containing text, emotions, color, and speech rate.
+4. `GroqResponseMapper` deserializes the payload into an `AiReply` domain entity.
+5. `ConversationBloc` emits `ConversationSpeaking`, triggers `UpdateEmotionEvent` on `AvatarBloc`, and invokes `TtsService.speak()`.
+6. During playback, `ConversationBloc` modulates `Mouth_Value` on the Rive state machine at 110ms syllable intervals.
+7. Upon completion or interruption, the mouth closes (`0.0`), `ConversationIdle` is emitted, and STT auto-restarts in voice mode.
 
 ---
 
@@ -95,7 +105,7 @@ lib/
     ├── auth/              # Operator onboarding and callsign storage
     ├── avatar/            # Rive state machine controller, AvatarBloc, artboard view
     ├── home/              # ConversationBloc, dialogue bubble, mic & keyboard controls
-    ├── speech/            # Speech-to-text recognition interface and implementation
+    ├── speech/            # Speech-to-text recognition & TTS synthesis services
     └── splash/            # Application entry splash screen
 ```
 
@@ -223,12 +233,12 @@ lib/
 
 ### Architectural Highlights
 
-- **Domain Independence**: The `domain/` layer contains pure business rules and contracts with zero dependencies on `data/` or external presentation packages.
-- **Independent Dual-BLoC Design**: `AvatarBloc` (render state: facial emotions and mouth value) and `ConversationBloc` (lifecycle state: idle, listening, thinking, speaking) remain decoupled. They communicate exclusively through high-level event dispatching.
-- **Event Concurrency Transformers**: 
-  - `droppable()` on `SendUserMessageEvent` ensures outgoing LLM requests are dropped if a query is already in flight.
-  - `restartable()` on `UpdateEmotionEvent` cancels pending reset timers when new emotion requests arrive in quick succession.
-- **Single Source of Truth (`AvatarEmotion`)**: The `AvatarEmotion` enum governs prompt generation, Rive input mapping, and mutual exclusivity logic, avoiding desynchronization between LLM instructions and animation assets.
+- **Strict Domain Independence**: The `domain/` layer contains pure Dart abstractions (`SpeechRecognizer`, `TtsService`, `AiRepository`, `ChatMessage`, `AiReply`) with zero dependencies on concrete packages or the data layer.
+- **Decoupled Dual-BLoC Design**: `AvatarBloc` (visual rendering state) and `ConversationBloc` (dialogue & lifecycle orchestration) remain distinct. `ConversationBloc` communicates with `AvatarBloc` through high-level event dispatching.
+- **Concurrency Transformers**:
+  - `droppable()` on `SendUserMessageEvent` ignores extraneous submit actions while an LLM round-trip is already in flight.
+  - `restartable()` on `UpdateEmotionEvent` cancels ongoing 7-second neutral reset timers when new animations are triggered.
+- **Single Source of Truth (`AvatarEmotion`)**: Enforces strict mutual exclusivity rules (e.g., `boring`, `checkingOnUser`, and `shakingHead` cannot conflict) while auto-generating prompt definitions and Rive bindings.
 
 ---
 
@@ -239,11 +249,12 @@ lib/
 | `flutter_bloc` | `^9.1.1` | Predictable state management across conversation and avatar lifecycles |
 | `bloc_concurrency` | `^0.3.0` | Event transformers (`droppable`, `restartable`) for async flow control |
 | `rive` | `^0.14.11` | 2D vector runtime animation controller and state machine execution |
+| `flutter_tts` | `^4.2.5` | Text-to-speech synthesis with platform voice selection and lifecycle hooks |
+| `speech_to_text` | `^7.4.0` | Continuous device speech recognition for voice interaction |
+| `dio` | `^5.11.1` | HTTP networking client with configured 15-second request timeouts |
 | `get_it` | `^9.2.1` | Compile-time dependency injection and service locator |
 | `go_router` | `^17.5.0` | Declarative routing and deep navigation management |
-| `dio` | `^5.11.1` | HTTP networking client with custom interceptors and timeout control |
-| `speech_to_text` | `^7.4.0` | Device-native speech recognition for hands-free operator input |
-| `shared_preferences` | `^2.5.5` | Local persistent storage for operator callsign and settings |
+| `shared_preferences` | `^2.5.5` | Local persistent storage for operator callsign and interaction modes |
 | `flutter_dotenv` | `^6.0.1` | Environment variable management for API keys and endpoint URLs |
 | `flutter_native_splash`| `^2.4.7` | Platform-native launch splash generation |
 | `device_preview` | `^1.3.1` | Multi-screen responsiveness inspection tool |
@@ -256,7 +267,7 @@ lib/
 ### Prerequisites
 
 - Flutter SDK: `^3.11.5` / Flutter 3.24+ (Tested on Flutter `3.41.9` / Dart `3.11.5`)
-- A working microphone (for Speech-to-Text input)
+- A working microphone (for Speech-to-Text input) and speakers/headphones (for TTS audio)
 - A free Groq API Key from [console.groq.com](https://console.groq.com)
 
 ### Installation
@@ -276,7 +287,7 @@ lib/
    ```bash
    cp .env.example .env
    ```
-   Open `.env` and provide your Groq credentials:
+   Open `.env` and supply your Groq credentials:
    ```env
    API=gsk_your_actual_groq_api_key_here
    API_URL=https://api.groq.com/openai/v1/chat/completions
@@ -331,28 +342,36 @@ The AI system prompt (`AvatarEmotion.promptList`), conflict resolver (`AvatarEmo
 
 ---
 
+## 🧪 Testing
+
+- **Static Analysis**: Verified clean using `flutter analyze` with 0 compile errors and 0 critical warnings.
+- **Unit & BLoC Tests**: Planned <!-- TODO: Add unit and bloc test suite -->. Existing placeholder test located in `test/widget_test.dart`.
+
+---
+
 ## 🗺️ Roadmap
 
 - [x] Operator onboarding and local preference persistence (`shared_preferences`)
 - [x] Clean Architecture with feature-first BLoC state management
 - [x] Dynamic 2D Rive artboard controlled via `State Machine 2`
 - [x] Concurrency control via `droppable()` and `restartable()`
-- [x] Speech-to-Text integration for voice input (`speech_to_text`)
+- [x] Speech-to-Text continuous auto-listening loop (`SpeechRecognizer`)
 - [x] Groq LLM API integration with structured JSON response parsing
 - [x] In-memory rolling conversation history (20 messages)
-- [x] Autonomous idle timeout nudge behaviors
-- [x] Text-to-Speech (TTS) audio vocalization 
-- [x] Speech-driven lip-sync audio frequency analysis 
+- [x] Text-to-Speech (TTS) voice synthesis with natural voice selection (`TtsService`)
+- [x] LLM-controlled dynamic speech rate based on emotion (`0.3` - `0.75`)
+- [x] Real-time syllable-based Rive lip-sync mouth animation (`Mouth_Value`)
+- [x] Autonomous idle timeout nudge behaviors with audio vocalization
 
 
 ---
 
 ## ⚠️ Known Limitations
 
-- **No Built-in Audio Output**: Speech synthesis (TTS) is not yet active; avatar responses are rendered visually via the dialogue bubble.
 - **Client-Bundled Secrets**: The `.env` file is embedded as a bundle asset, which is unsafe for production deployment.
 - **Session Memory Volatility**: Conversation history is maintained in RAM and resets when the app process terminates.
 - **Third-Party Model Upstream**: Relies on Groq's hosted `openai/gpt-oss-20b` endpoint; API schema revisions or model deprecations require prompt updates.
+- **Device-Dependent TTS Voices**: Voice naturalness depends on the availability of Google WaveNet network voices (Android) or enhanced Siri voices (iOS) installed on the target device.
 
 ---
 
@@ -374,5 +393,6 @@ The codebase of this project is licensed under the [MIT License](LICENSE).
 
 **<!-- TODO: Mohamed Heiba -->**
 
-- GitHub: [@<!-- TODO: mohaaHeiba -->](https://github.com/<!-- TODO: mohaaHeiba -->)
-- LinkedIn: [<!-- TODO: mohamed-heiba-141963325 -->](https://linkedin.com/in/<!-- TODO: mohamed-heiba-141963325 -->)
+- GitHub: [mohaaHeiba](https://github.com/mohaaHeiba)
+- LinkedIn: [mohamed-heiba-141963325](https://linkedin.com/in/mohamed-heiba-141963325 )
+
