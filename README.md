@@ -176,4 +176,4 @@ lib/
 
 ## License
 
-MIT © [Your Name](https://github.com/mohaaHeiba)
+MIT © [Mohamed Heiba](https://github.com/mohaaHeiba)
