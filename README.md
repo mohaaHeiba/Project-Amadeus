@@ -1,4 +1,4 @@
-# Amadeus (Project Amadeus)
+# Amadeus 
 
 An interactive 2D AI companion for Flutter, inspired by the "Amadeus" system from *Steins;Gate 0*.
 
