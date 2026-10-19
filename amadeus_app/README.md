@@ -8,9 +8,11 @@ Amadeus lets you talk to an animated 2D avatar of Kurisu Makise using voice or t
 
 ## Demo
 
-![Demo](docs/demo.gif)
+![Amadeus Demo](docs/demo.gif)
 
-| Onboarding | Voice & Text Chat | Emotion Animations |
+> 🎥 **[Watch Full Video Demo (MP4)](docs/demo.mp4)** — Full interaction showing speech recognition, AI reasoning, Rive lip-sync, and emotion transitions on an Android device.
+
+| Onboarding Screen | Voice & Text Interaction | Reactive Emotion State |
 | :---: | :---: | :---: |
 | ![Auth](docs/screenshots/auth_screen.png) | ![Chat](docs/screenshots/chat_interface.png) | ![Emotions](docs/screenshots/emotion_states.png) |
 
@@ -70,6 +72,24 @@ sequenceDiagram
 4. **Animation**: `AvatarBloc` triggers the matching Rive animations (`angry`, `blushing`, etc.).
 5. **Speech & Lip-Sync**: `TtsService` plays the voice audio while dynamically moving her mouth (`Mouth_Value`).
 6. **Auto-Listen**: When she finishes speaking, the app automatically starts listening for your next reply.
+
+---
+
+## 🎭 Rive 2D Avatar & State Machine
+
+The avatar was designed and rigged in **Rive**, utilizing bone deformation and a dedicated State Machine (`State Machine 2`) to handle lifelike idle states, emotions, and lip-sync:
+
+![Rive State Machine & 1D Blend Tree](docs/screenshots/rive_editor.png)
+
+- **1D Blend Tree Lip-Sync (`Mouth_Value`)**: Driven in real-time by `AvatarBloc` during TTS speech playback. Interpolates across `0_lips` (0.0), `Half_Open_lips` (33.0), `open_lips` (66.0), and max mouth aperture (100.0) to match speech cadence.
+- **Emotion State Machine Inputs**:
+  - `angry` (Boolean): Frowning and annoyed expression markings
+  - `isBlushing` (Boolean): Tsundere blush markings
+  - `are_u_okay` (Boolean): Curious head tilt checking on operator
+  - `no` (Boolean): Shaking head in disagreement
+  - `boring` (Boolean): Slumped, bored posture
+  - `Hand_to_Chest` (Boolean): Thoughtful / explaining gesture
+- **Continuous Procedural Motion**: Independent layers for breathing, blinking, and hair physics running continuously alongside state transitions.
 
 ---
 
